@@ -1,3 +1,7 @@
+---
+title: ElTablePro 介绍与示例
+description: ElTablePro 的介绍、示例、远程数据和分页用法。
+---
 <script setup lang="ts">
 import BasicDemo from './demos/basic.vue'
 import RemoteDemo from './demos/remote.vue'
@@ -194,3 +198,11 @@ tableRef.value?.clearSelection()
 ```
 
 想继续查看完整属性、事件和实例方法，可以阅读 [Props](/components/table-pro/props)、[Events](/components/table-pro/events) 和[实例方法](/components/table-pro/instance)。
+
+## API
+
+除了本页介绍和示例，ElTablePro 的完整参考按类型拆分为：
+
+- [Props](/components/table-pro/props)：组件自有属性和 ElTable 原生属性
+- [事件](/components/table-pro/events)：loaded、error 与原生事件透传
+- [实例方法](/components/table-pro/instance)：reload 与 ElTable 实例 API

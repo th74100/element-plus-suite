@@ -1,3 +1,7 @@
+---
+title: ElTablePro 实例方法
+description: ElTablePro 的 reload 方法以及内部 ElTable 的实例方法。
+---
 # 实例方法
 
 ElTablePro 的实例类型同时包含自己的 reload 和内部 ElTable 的全部方法。

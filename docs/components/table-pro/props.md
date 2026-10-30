@@ -1,3 +1,7 @@
+---
+title: ElTablePro Props
+description: ElTablePro 的 columns、data、request、pagination 和 ElTable 原生属性。
+---
 # Props
 
 ElTablePro 继承 ElTable 的全部属性，并新增以下四项。

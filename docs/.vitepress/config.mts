@@ -8,7 +8,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: '指南', link: '/guide/introduction' },
-      { text: '组件', link: '/components/table-pro/' },
+      { text: '组件', link: '/components/' },
     ],
     sidebar: {
       '/guide/': [
@@ -21,7 +21,13 @@ export default defineConfig({
           ],
         },
       ],
-      '/components/table-pro/': [
+      '/components/': [
+        {
+          text: '组件总览',
+          items: [
+            { text: '全部组件', link: '/components/' },
+          ],
+        },
         {
           text: '数据展示',
           items: [
@@ -29,6 +35,18 @@ export default defineConfig({
             { text: 'Props', link: '/components/table-pro/props' },
             { text: 'Events', link: '/components/table-pro/events' },
             { text: '实例方法', link: '/components/table-pro/instance' },
+          ],
+        },
+        {
+          text: '表单',
+          items: [
+            { text: 'ElFormPro（规划中）', link: '/components/form/' },
+          ],
+        },
+        {
+          text: '基础',
+          items: [
+            { text: 'ElButton（规划中）', link: '/components/button/' },
           ],
         },
       ],

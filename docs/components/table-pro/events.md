@@ -1,3 +1,7 @@
+---
+title: ElTablePro 事件
+description: ElTablePro 的 loaded、error 事件以及 ElTable 原生事件透传。
+---
 # Events
 
 ElTable 的原生事件都会透传到内部表格：

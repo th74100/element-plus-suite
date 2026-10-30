@@ -57,3 +57,24 @@
   .vp-demo__preview { padding: 16px; }
   .demo-toolbar { flex-wrap: wrap; }
 }
+
+/* 组件文档：让左侧分组更像组件目录，分组标题更醒目。 */
+.VPSidebar .group:has(.VPSidebarItem.level-1.is-active) > .VPSidebarItem > .item .text {
+  color: var(--vp-c-brand-1);
+}
+.VPSidebarItem.is-link > .item {
+  border-radius: 7px;
+  transition: background-color .18s ease;
+}
+.VPSidebarItem.is-link > .item:hover {
+  background: var(--vp-c-brand-soft);
+}
+.VPSidebarItem.level-1 > .item > .link > .text {
+  font-weight: 550;
+}
+
+@media (min-width: 960px) {
+  .VPSidebar {
+    padding-top: 22px;
+  }
+}
