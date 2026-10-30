@@ -11,6 +11,12 @@ describe('TablePro pagination config', () => {
     })
   })
 
+  it('显式 true 表示使用默认分页', () => {
+    expect(normalizePagination(true)).toEqual({
+      ...TABLE_PRO_DEFAULT_PAGINATION,
+    })
+  })
+
   it('显式 false 表示关闭分页', () => {
     expect(normalizePagination(false)).toBeNull()
   })

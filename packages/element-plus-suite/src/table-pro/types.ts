@@ -87,7 +87,7 @@ export interface TableProPagination {
 export interface TableProOwnProps<Row> {
   columns?: TableProColumn<Row>[]
   request?: TableProRequest<Row>
-  pagination?: false | TableProPagination
+  pagination?: boolean | TableProPagination
 }
 
 type ElTableProps = Partial<TableProps>
@@ -126,13 +126,15 @@ export type ResolvedTableProPagination = {
 }
 
 export function normalizePagination(
-  pagination: false | TableProPagination | undefined,
+  pagination: boolean | TableProPagination | undefined,
 ): ResolvedTableProPagination | null {
   if (pagination === false) return null
 
+  const config = pagination === true ? {} : (pagination ?? {})
+
   return {
     ...TABLE_PRO_DEFAULT_PAGINATION,
-    ...(pagination ?? {}),
+    ...config,
   }
 }
 

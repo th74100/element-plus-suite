@@ -9,7 +9,7 @@ import {
  * false 表示关闭分页，此时传给 request 的 page/pageSize 都是 null。
  */
 export function useTablePagination(
-  pagination: () => false | TableProPagination | undefined,
+  pagination: () => boolean | TableProPagination | undefined,
 ) {
   const config = computed(() => normalizePagination(pagination()))
 

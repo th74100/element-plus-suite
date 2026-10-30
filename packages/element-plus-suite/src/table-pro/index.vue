@@ -39,7 +39,7 @@ export default defineComponent({
       default: undefined,
     },
     pagination: {
-      type: [Boolean, Object] as PropType<false | TableProPagination>,
+      type: [Boolean, Object] as PropType<boolean | TableProPagination>,
       default: () => ({}),
     },
     data: {
