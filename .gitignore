@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+.vite/
+.DS_Store
+*.log
+
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+playground/dist/
+packages/*/dist/
+*.tgz
+
+.npm-cache/
+consumer-check/

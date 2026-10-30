@@ -1,0 +1,31 @@
+{
+  "name": "element-plus-suite-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.22.0",
+  "scripts": {
+    "dev": "pnpm --filter element-plus-suite-playground dev",
+    "build": "pnpm --filter element-plus-suite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.test.json",
+    "docs:dev": "pnpm --filter element-plus-suite-docs dev",
+    "docs:build": "pnpm --filter element-plus-suite-docs build",
+    "docs:preview": "pnpm --filter element-plus-suite-docs preview"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vitejs/plugin-vue-jsx": "^4.2.0",
+    "@vue/test-utils": "^2.4.6",
+    "element-plus": "^2.11.7",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.4.5",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^3.2.7",
+    "vue": "^3.5.24",
+    "vue-tsc": "^2.2.12",
+    "@types/node": "^22.10.2"
+  }
+}
