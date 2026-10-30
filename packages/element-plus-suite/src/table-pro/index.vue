@@ -48,7 +48,7 @@ export default defineComponent({
     },
     data: {
       type: Array as PropType<any[]>,
-      default: undefined,
+      default: () => [],
     },
     rowKey: {
       type: [String, Function] as PropType<
@@ -147,7 +147,7 @@ export default defineComponent({
     expose(exposed)
 
     onMounted(() => {
-      if (props.request && !props.data) {
+      if (props.request) {
         void reload()
       }
     })
