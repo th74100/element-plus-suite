@@ -32,7 +32,7 @@ export default defineComponent({
   props: {
     columns: {
       type: Array as PropType<TableProColumn<any>[]>,
-      required: true,
+      default: () => [],
     },
     request: {
       type: Function as PropType<TableProRequest<any>>,

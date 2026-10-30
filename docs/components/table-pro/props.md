@@ -8,7 +8,7 @@ ElTablePro 继承 ElTable 的全部属性，并新增以下四项。
 
 | 属性 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| columns | `TableProColumn<Row>[]` | 必填 | 列配置，支持 ElTableColumn 属性和插槽字段 |
+| columns | `TableProColumn<Row>[]` | [] | 列配置 |
 | data | Row[] | [] | 表数据 |
 | request | `TableProRequest<Row>` | undefined | 远程请求函数 |
 | pagination | false \| TableProPagination | {} | 省略时启用默认分页，false 时关闭 |

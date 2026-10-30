@@ -31,6 +31,17 @@ describe('TablePro', () => {
     expect(wrapper.text()).toContain('李四')
   })
 
+  it('不传 columns 时使用空数组渲染', () => {
+    const wrapper = mount(ElTablePro, {
+      props: {
+        rowKey: 'id',
+        pagination: false,
+      },
+    })
+
+    expect(wrapper.find('.el-table').exists()).toBe(true)
+  })
+
   it('不传 data 时使用空数组渲染', async () => {
     const wrapper = mount(ElTablePro, {
       props: {
