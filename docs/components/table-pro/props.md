@@ -6,12 +6,12 @@ description: ElTablePro 的 columns、data、request、pagination 和 ElTable �
 
 ElTablePro 继承 ElTable 的全部属性，并新增以下四项。
 
-| 属性 | 类型 | 默认值 | 说明 |
+| 属性 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| columns | TableProColumn&lt;Row&gt;[] | [] | 列配置 |
-| data | Row[] | [] | 表数据 |
-| request | TableProRequest&lt;Row&gt; | undefined | 远程请求函数 |
-| pagination | boolean \| TableProPagination | true | 省略时启用默认分页，false 时关闭 |
+| columns | 列配置 | TableProColumn&lt;Row&gt;[] | [] |
+| data | 表数据 | Row[] | [] |
+| request | 远程请求函数 | TableProRequest&lt;Row&gt; | undefined |
+| pagination | 是否启用分页 | boolean \| TableProPagination | true |
 
 ## columns
 
