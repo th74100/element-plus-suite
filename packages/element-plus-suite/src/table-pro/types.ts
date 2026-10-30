@@ -88,7 +88,6 @@ export interface TableProOwnProps<Row> {
   columns?: TableProColumn<Row>[]
   request?: TableProRequest<Row>
   pagination?: false | TableProPagination
-  loading?: boolean
 }
 
 type ElTableProps = Partial<TableProps>

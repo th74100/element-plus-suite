@@ -119,6 +119,31 @@ describe('TablePro', () => {
     await vi.waitFor(() => expect(wrapper.text()).toContain('张三'))
   })
 
+  it('远程请求期间自动显示 loading', async () => {
+    let resolveRequest: (value: { data: User[], total: number }) => void
+    const request = vi.fn(() => new Promise<{ data: User[], total: number }>((resolve) => {
+      resolveRequest = resolve
+    }))
+
+    const wrapper = mount(ElTablePro, {
+      props: {
+        columns: columns as any,
+        request,
+        rowKey: 'id',
+      },
+    })
+
+    await vi.waitFor(() =>
+      expect(wrapper.find('.el-loading-mask').exists()).toBe(true),
+    )
+
+    resolveRequest!({ data: rows, total: rows.length })
+
+    await vi.waitFor(() =>
+      expect(wrapper.find('.el-loading-mask').exists()).toBe(false),
+    )
+  })
+
   it('通过 $attrs 透传 ElTable 属性', () => {
     const wrapper = mount(ElTablePro, {
       props: {

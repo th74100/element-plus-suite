@@ -174,7 +174,7 @@ ElTable 的原生事件会直接透传。常见做法是先更新页面里的查
 
 ## 保留原生能力
 
-除了 columns、request、pagination 和 loading，其余属性与事件都会交给内部 ElTable：
+除了 columns、request 和 pagination，其余属性与事件都会交给内部 ElTable：
 
 ```vue
 <ElTablePro

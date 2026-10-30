@@ -12,7 +12,6 @@ ElTablePro 继承 ElTable 的全部属性，并新增以下四项。
 | data | Row[] | [] | 表数据 |
 | request | `TableProRequest<Row>` | undefined | 远程请求函数 |
 | pagination | false \| TableProPagination | {} | 省略时启用默认分页，false 时关闭 |
-| loading | boolean | false | 外部加载状态，与内部请求状态合并 |
 
 ## columns
 

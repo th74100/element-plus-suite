@@ -42,10 +42,6 @@ export default defineComponent({
       type: [Boolean, Object] as PropType<false | TableProPagination>,
       default: () => ({}),
     },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
     data: {
       type: Array as PropType<any[]>,
       default: () => [],
@@ -89,9 +85,7 @@ export default defineComponent({
       onError: (error) => emit('error', error),
     })
 
-    const isLoading = computed(
-      () => props.loading || requestLoading.value,
-    )
+    const isLoading = computed(() => requestLoading.value)
 
     const displayData = computed(() => {
       if (props.request) return remoteData.value
