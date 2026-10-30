@@ -1,6 +1,6 @@
 ---
-title: ElTablePro 介绍与示例
-description: ElTablePro 的介绍、示例、远程数据和分页用法。
+title: Table 表格 | Element Plus Suite
+description: 基于 Element Plus 的表格组件，支持列定义、分页和远程请求。
 ---
 <script setup lang="ts">
 import BasicDemo from './demos/basic.vue'
@@ -9,9 +9,12 @@ import SlotDemo from './demos/slots.vue'
 import EventsDemo from './demos/events.vue'
 </script>
 
-# ElTablePro
+# Table 表格
 
-ElTablePro 不是另一套表格实现。它仍然渲染 ElTable，只是把列定义、分页和远程请求这几类重复代码收进了一个组件。
+高级表格组件，支持多级表头，自定义列、分页和远程请求。
+
+## 基础用法
+通过配置快速生成表格。
 
 <Demo>
   <BasicDemo />
@@ -55,29 +58,88 @@ const rows: Member[] = [
   </template>
 </Demo>
 
-只需要 columns 和 data 时，表格的模板部分可以非常短。列宽、对齐方式和固定列继续放在 columns 中，写法和 ElTableColumn 保持一致。
+## 远程数据
 
-## 接入远程数据
-
-远程模式由 request 开启。请求参数中只有页码、每页条数和取消信号，业务查询条件通过页面闭包自行组合。
+远程模式由 `request` 开启。请求参数中只有页码、每页条数和取消信号，业务查询条件通过页面闭包自行组合。
 
 <Demo>
   <RemoteDemo />
   <template #code>
 
-```ts
-const requestMembers: TableProRequest<Member> = async ({ page, pageSize, signal }) => {
-  const response = await fetch(
-    `/api/members?page=${page}&pageSize=${pageSize}&keyword=${keyword.value}`,
-    { signal },
-  )
+```vue
+<script setup lang="ts">
+import { ref, shallowRef } from 'vue'
+import {
+  ElTablePro,
+  type TableProColumn,
+  type TableProInstance,
+  type TableProRequest,
+} from 'element-plus-suite'
+
+interface Member {
+  id: number
+  name: string
+  role: string
+}
+
+const keyword = ref('')
+const tableRef = shallowRef<TableProInstance>()
+
+const columns: TableProColumn<Member>[] = [
+  { prop: 'name', label: '成员', minWidth: 140 },
+  { prop: 'role', label: '角色', minWidth: 180 },
+]
+
+const requestMembers: TableProRequest<Member> = async ({
+  page,
+  pageSize,
+  signal,
+}) => {
+  const params = new URLSearchParams({
+    page: String(page ?? 1),
+    pageSize: String(pageSize ?? 20),
+    keyword: keyword.value.trim(),
+  })
+
+  const response = await fetch(`/api/members?${params}`, { signal })
+
+  if (!response.ok) {
+    throw new Error('加载成员失败')
+  }
+
   const payload = await response.json()
 
   return {
-    data: payload.data.list,
-    total: payload.data.count,
+    data: payload.data.list as Member[],
+    total: payload.data.count as number,
   }
 }
+
+function search() {
+  void tableRef.value?.reload({ page: 1 })
+}
+</script>
+
+<template>
+  <div class="toolbar">
+    <ElInput
+      v-model="keyword"
+      placeholder="搜索成员或角色"
+      clearable
+      @keyup.enter="search"
+    />
+    <ElButton type="primary" @click="search">查询</ElButton>
+  </div>
+
+  <ElTablePro
+    ref="tableRef"
+    :columns="columns"
+    :request="requestMembers"
+    row-key="id"
+    border
+    :pagination="{ pageSize: 10 }"
+  />
+</template>
 ```
 
   </template>
