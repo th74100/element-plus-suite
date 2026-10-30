@@ -1,0 +1,19 @@
+{
+  "name": "element-plus-suite-docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev .",
+    "build": "vitepress build .",
+    "preview": "vitepress preview ."
+  },
+  "dependencies": {
+    "element-plus": "^2.11.7",
+    "element-plus-suite": "workspace:*",
+    "vue": "^3.5.24"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}

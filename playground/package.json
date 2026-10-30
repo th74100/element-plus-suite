@@ -1,0 +1,16 @@
+{
+  "name": "element-plus-suite-playground",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "element-plus": "^2.11.7",
+    "element-plus-suite": "workspace:*",
+    "vue": "^3.5.24"
+  }
+}
