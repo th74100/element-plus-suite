@@ -1,16 +1,40 @@
 # 实例方法
 
-`TableProInstance` 复用 Element Plus 的 `TableInstance` 类型。
+ElTablePro 的实例类型同时包含自己的 reload 和内部 ElTable 的全部方法。
 
 ```ts
-const tableRef = ref<TableProInstance>()
+import { useTemplateRef } from 'vue'
+import type { TableProInstance } from 'element-plus-suite'
 
-tableRef.value?.reload()
-tableRef.value?.reload({ page: 1 })
-
-tableRef.value?.clearSort()
-tableRef.value?.clearSelection()
-tableRef.value?.scrollTo({ top: 0 })
+const tableRef = useTemplateRef<TableProInstance>('tableRef')
 ```
 
-`reload` 由 `ElTablePro` 提供，其他实例方法直接来自内部 `ElTable`。
+## reload
+
+```ts
+await tableRef.value?.reload()
+await tableRef.value?.reload({ page: 1 })
+```
+
+不传参数时，使用当前分页状态重新请求。传入 page 时，先把页码切换到指定值，再重新请求。搜索后回到第一页是常见用法：
+
+```ts
+function search() {
+  void tableRef.value?.reload({ page: 1 })
+}
+```
+
+## ElTable 方法
+
+其余方法直接来自 ElTable，调用方式不变：
+
+```ts
+tableRef.value?.scrollTo({ top: 0 })
+tableRef.value?.setScrollTop(0)
+tableRef.value?.clearSort()
+tableRef.value?.clearSelection()
+tableRef.value?.toggleAllSelection()
+tableRef.value?.doLayout()
+```
+
+如果 TypeScript 能识别 ElTable 对应的方法，ElTablePro 实例上也会有同样的类型提示。

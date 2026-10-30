@@ -1,9 +1,10 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'element-plus-suite',
-  description: '基于 Element Plus 的扩展组件库',
+  title: 'Element Plus Suite',
+  description: '保留 ElTable 全部能力，同时减少表格页面中的重复代码。',
   lang: 'zh-CN',
+  cleanUrls: true,
   themeConfig: {
     nav: [
       { text: '指南', link: '/guide/introduction' },
@@ -12,9 +13,9 @@ export default defineConfig({
     sidebar: {
       '/guide/': [
         {
-          text: '指南',
+          text: '开始使用',
           items: [
-            { text: '介绍', link: '/guide/introduction' },
+            { text: '为什么用它', link: '/guide/introduction' },
             { text: '安装', link: '/guide/installation' },
             { text: '快速开始', link: '/guide/quick-start' },
           ],
@@ -22,9 +23,9 @@ export default defineConfig({
       ],
       '/components/table-pro/': [
         {
-          text: 'ElTablePro',
+          text: '数据展示',
           items: [
-            { text: '概览', link: '/components/table-pro/' },
+            { text: 'ElTablePro', link: '/components/table-pro/' },
             { text: 'Props', link: '/components/table-pro/props' },
             { text: 'Events', link: '/components/table-pro/events' },
             { text: '实例方法', link: '/components/table-pro/instance' },
@@ -32,10 +33,14 @@ export default defineConfig({
         },
       ],
     },
-    outline: { level: [2, 3] },
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/th74100/element-plus-suite' },
+    ],
+    outline: { level: [2, 3], label: '本页目录' },
+    docFooter: { prev: '上一页', next: '下一页' },
     footer: {
       message: '基于 MIT License 发布',
-      copyright: 'Copyright © 2026 element-plus-suite contributors',
+      copyright: 'Copyright © 2026 Element Plus Suite contributors',
     },
   },
 })
