@@ -1,0 +1,32 @@
+{
+  "name": "element-plus-suite",
+  "version": "0.0.1",
+  "description": "Unofficial enhancement components for Element Plus",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "peerDependencies": {
+    "element-plus": ">=2.6.0",
+    "vue": ">=3.4.0"
+  },
+  "devDependencies": {
+    "element-plus": "^2.11.7",
+    "vue": "^3.5.24"
+  }
+}
