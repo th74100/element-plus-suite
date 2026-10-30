@@ -150,4 +150,10 @@ function handleFilterChange(next: Record<string, string[]>) {
 .app {
   padding: 24px;
 }
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
 </style>
+
