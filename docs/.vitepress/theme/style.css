@@ -52,6 +52,7 @@
 .demo-toolbar .el-input { max-width: 280px; }
 .demo-note { margin: 14px 0 0; color: var(--vp-c-text-2); font-size: .86rem; }
 .el-table { --el-table-header-bg-color: var(--vp-c-bg-soft); }
+.vp-doc table { margin: 0; }
 
 @media (max-width: 760px) {
   .vp-demo__preview { padding: 16px; }
