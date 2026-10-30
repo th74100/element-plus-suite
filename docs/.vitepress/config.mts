@@ -38,9 +38,5 @@ export default defineConfig({
     ],
     outline: { level: [2, 3], label: '本页目录' },
     docFooter: { prev: '上一页', next: '下一页' },
-    footer: {
-      message: '基于 MIT License 发布',
-      copyright: 'Copyright © 2026 Element Plus Suite contributors',
-    },
   },
 })
