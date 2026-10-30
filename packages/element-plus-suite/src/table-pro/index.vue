@@ -40,7 +40,7 @@ export default defineComponent({
     },
     pagination: {
       type: [Boolean, Object] as PropType<boolean | TableProPagination>,
-      default: () => ({}),
+      default: true,
     },
     data: {
       type: Array as PropType<any[]>,

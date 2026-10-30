@@ -11,7 +11,7 @@ ElTablePro 继承 ElTable 的全部属性，并新增以下四项。
 | columns | TableProColumn&lt;Row&gt;[] | [] | 列配置 |
 | data | Row[] | [] | 表数据 |
 | request | TableProRequest&lt;Row&gt; | undefined | 远程请求函数 |
-| pagination | boolean \| TableProPagination | {} | 省略时启用默认分页，false 时关闭 |
+| pagination | boolean \| TableProPagination | true | 省略时启用默认分页，false 时关闭 |
 
 ## columns
 
