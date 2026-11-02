@@ -1,10 +1,9 @@
 <template>
   <ElTablePro
     :columns="columns"
-    :data="rows"
+    :data="dataSource"
     row-key="id"
     :pagination="false"
-    border
   />
 </template>
 
@@ -24,7 +23,7 @@ const columns: TableProColumn<Member>[] = [
   { prop: 'status', label: '状态', width: 100 },
 ]
 
-const rows: Member[] = [
+const dataSource: Member[] = [
   { id: 1, name: '林晓', role: '产品设计', status: '在线' },
   { id: 2, name: '陈默', role: '前端开发', status: '离开' },
   { id: 3, name: '周宁', role: '数据分析', status: '在线' },

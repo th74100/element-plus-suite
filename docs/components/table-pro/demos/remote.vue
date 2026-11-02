@@ -8,8 +8,6 @@
     ref="tableRef"
     :columns="columns"
     :request="requestMembers"
-    row-key="id"
-    border
     :pagination="{ pageSize: 10 }"
     @loaded="lastLoadedAt = new Date().toLocaleTimeString()"
   />
@@ -34,6 +32,36 @@ const allMembers: Member[] = [
   { id: 4, name: '苏禾', role: '品牌运营' },
   { id: 5, name: '顾远', role: '后端开发' },
   { id: 6, name: '梁秋', role: '客户成功' },
+  { id: 7, name: '许言', role: '产品设计' },
+  { id: 8, name: '沈川', role: '前端开发' },
+  { id: 9, name: '宋岚', role: '数据分析' },
+  { id: 10, name: '陆遥', role: '品牌运营' },
+  { id: 11, name: '唐越', role: '后端开发' },
+  { id: 12, name: '何嘉', role: '客户成功' },
+  { id: 13, name: '乔安', role: '产品设计' },
+  { id: 14, name: '方舟', role: '前端开发' },
+  { id: 15, name: '叶青', role: '数据分析' },
+  { id: 16, name: '江澄', role: '品牌运营' },
+  { id: 17, name: '韩松', role: '后端开发' },
+  { id: 18, name: '温宁', role: '客户成功' },
+  { id: 19, name: '白露', role: '产品设计' },
+  { id: 20, name: '谢尔', role: '前端开发' },
+  { id: 21, name: '孟夏', role: '数据分析' },
+  { id: 22, name: '罗一', role: '品牌运营' },
+  { id: 23, name: '段星', role: '后端开发' },
+  { id: 24, name: '余欢', role: '客户成功' },
+  { id: 25, name: '季然', role: '产品设计' },
+  { id: 26, name: '俞川', role: '前端开发' },
+  { id: 27, name: '高远', role: '数据分析' },
+  { id: 28, name: '邵宁', role: '品牌运营' },
+  { id: 29, name: '施南', role: '后端开发' },
+  { id: 30, name: '章易', role: '客户成功' },
+  { id: 31, name: '金禾', role: '产品设计' },
+  { id: 32, name: '秦川', role: '前端开发' },
+  { id: 33, name: '尤溪', role: '数据分析' },
+  { id: 34, name: '程野', role: '品牌运营' },
+  { id: 35, name: '魏然', role: '后端开发' },
+  { id: 36, name: '于安', role: '客户成功' },
 ]
 
 const keyword = ref('')

@@ -132,7 +132,6 @@ const requestMembers: TableProRequest<Member> = async ({
     :columns="columns"
     :request="requestMembers"
     row-key="id"
-    border
     :pagination="{ pageSize: 10 }"
   />
 </template>
@@ -180,7 +179,6 @@ const rows: Order[] = [
     :data="rows"
     row-key="id"
     :pagination="false"
-    border
   >
     <template #status="{ row }">
       <ElTag :type="row.status === '正常' ? 'success' : 'warning'">
@@ -230,7 +228,7 @@ const rows: Task[] = [
 </script>
 
 <template>
-  <ElTablePro :columns="columns" :data="rows" row-key="id" :pagination="false" border>
+  <ElTablePro :columns="columns" :data="rows" row-key="id" :pagination="false">
     <template #score-header>
       <span class="custom-header">
         <span>评分</span>
