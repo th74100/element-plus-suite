@@ -79,7 +79,27 @@
 .demo-toolbar .el-input { max-width: 280px; }
 .demo-note { margin: 14px 0 0; color: var(--vp-c-text-2); font-size: .86rem; }
 .el-table { --el-table-header-bg-color: var(--vp-c-bg-soft); }
-.vp-doc table { margin: 0; }
+/* VitePress 的 Markdown 表格样式不应覆盖 Element Plus 内部 table。 */
+.el-table table {
+  display: table;
+  border-collapse: separate;
+  margin: 0;
+}
+.el-table th {
+  border: 0;
+  padding: 8px 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.el-table td {
+  border: 0;
+  padding: 8px 0;
+}
+.vp-doc > table,
+.vp-doc > div > table {
+  margin: 0;
+}
 /* Element Plus 分页器内部的 ul/ol 不应继承正文缩进。 */
 .vp-doc .el-pagination ul,
 .vp-doc .el-pagination ol {
