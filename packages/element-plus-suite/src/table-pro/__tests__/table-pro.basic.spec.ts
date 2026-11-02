@@ -144,6 +144,18 @@ describe('TablePro', () => {
     )
   })
 
+  it('不传 border 时不启用边框模式', () => {
+    const wrapper = mount(ElTablePro, {
+      props: {
+        columns: columns as any,
+        data: rows,
+        rowKey: 'id',
+        pagination: false,
+      },
+    })
+
+    expect(wrapper.find('.el-table').classes()).not.toContain('el-table--border')
+  })
   it('通过 $attrs 透传 ElTable 属性', () => {
     const wrapper = mount(ElTablePro, {
       props: {
