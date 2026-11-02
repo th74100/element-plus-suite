@@ -53,15 +53,20 @@
 .demo-note { margin: 14px 0 0; color: var(--vp-c-text-2); font-size: .86rem; }
 .el-table { --el-table-header-bg-color: var(--vp-c-bg-soft); }
 .vp-doc table { margin: 0; }
-/* VitePress 的正文列表样式不应影响 Element Plus 分页器内部的 ul/ol。 */
-.vp-doc .el-pagination ul,
-.vp-doc .el-pagination ol {
-  padding-left: 0;
+/* 正文列表不显示默认项目符号和外边距。 */
+.vp-doc ul,
+.vp-doc ol {
   margin: 0;
   list-style: none;
 }
-.vp-doc .el-pagination li + li {
+.vp-doc li + li {
   margin-top: 0;
+}
+
+/* Element Plus 分页器内部的 ul/ol 不应继承正文缩进。 */
+.vp-doc .el-pagination ul,
+.vp-doc .el-pagination ol {
+  padding-left: 0;
 }
 
 @media (max-width: 760px) {
