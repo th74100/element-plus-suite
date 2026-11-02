@@ -53,6 +53,16 @@
 .demo-note { margin: 14px 0 0; color: var(--vp-c-text-2); font-size: .86rem; }
 .el-table { --el-table-header-bg-color: var(--vp-c-bg-soft); }
 .vp-doc table { margin: 0; }
+/* VitePress 的正文列表样式不应影响 Element Plus 分页器内部的 ul/ol。 */
+.vp-doc .el-pagination ul,
+.vp-doc .el-pagination ol {
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+}
+.vp-doc .el-pagination li + li {
+  margin-top: 0;
+}
 
 @media (max-width: 760px) {
   .vp-demo__preview { padding: 16px; }
