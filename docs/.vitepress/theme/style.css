@@ -54,7 +54,8 @@
   cursor: pointer;
   transition: color .18s ease, background-color .18s ease;
 }
-.vp-demo__toggle:hover {
+.vp-demo__toggle:hover,
+.vp-demo__toggle.is-active {
   color: var(--vp-c-brand-1);
   background: var(--vp-c-brand-soft);
 }
@@ -71,8 +72,6 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.vp-demo__chevron { transition: transform .2s ease; }
-.vp-demo__chevron.is-open { transform: rotate(180deg); }
 .vp-demo__code { border-top: 1px solid var(--vp-c-divider); }
 .vp-demo__code .language-vue { margin: 0 !important; border-radius: 0 !important; }
 .vp-demo__code div[class*='language-'] { margin: 0; border-radius: 0; }

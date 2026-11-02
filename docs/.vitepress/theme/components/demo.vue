@@ -9,6 +9,7 @@
         <button
           type="button"
           class="vp-demo__toggle"
+          :class="{ 'is-active': visible }"
           :aria-expanded="visible"
           @click="visible = !visible"
         >
@@ -16,7 +17,6 @@
             <path d="m8 9-3 3 3 3M16 9l3 3-3 3M14 5l-4 14" />
           </svg>
           {{ visible ? '收起源码' : '查看源码' }}
-          <span class="vp-demo__chevron" :class="{ 'is-open': visible }">⌄</span>
         </button>
       </figcaption>
       <ElCollapseTransition>
