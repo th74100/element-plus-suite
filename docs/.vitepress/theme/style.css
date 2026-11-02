@@ -79,22 +79,41 @@
 .demo-toolbar .el-input { max-width: 280px; }
 .demo-note { margin: 14px 0 0; color: var(--vp-c-text-2); font-size: .86rem; }
 .el-table { --el-table-header-bg-color: var(--vp-c-bg-soft); }
-/* VitePress 的 Markdown 表格样式不应覆盖 Element Plus 内部 table。 */
+/* VitePress 的 Markdown 表格样式不应覆盖 Element Plus 的官方表格样式。 */
 .el-table table {
   display: table;
   border-collapse: separate;
   margin: 0;
+  overflow: visible;
 }
-.el-table th {
-  border: 0;
-  padding: 8px 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
+.el-table tr,
+.el-table tr:nth-child(2n) {
+  background-color: var(--el-table-tr-bg-color);
+  border-top: 0;
+  transition: none;
 }
-.el-table td {
-  border: 0;
+.el-table th.el-table__cell,
+.el-table td.el-table__cell {
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: var(--el-table-border);
+}
+.el-table th.el-table__cell {
+  background-color: var(--el-table-header-bg-color);
+  color: var(--el-table-header-text-color);
+  font-size: inherit;
+  font-weight: 600;
+  text-align: left;
+}
+.el-table td.el-table__cell {
+  font-size: inherit;
+}
+.el-table .el-table__cell {
   padding: 8px 0;
+}
+.el-table .cell {
+  padding: 0 12px;
 }
 .vp-doc > table,
 .vp-doc > div > table {
