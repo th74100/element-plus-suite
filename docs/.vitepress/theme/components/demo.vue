@@ -6,9 +6,17 @@
       </div>
       <figcaption class="vp-demo__bar">
         <span>示例</span>
-        <button type="button" class="vp-demo__toggle" @click="visible = !visible">
+        <button
+          type="button"
+          class="vp-demo__toggle"
+          :aria-expanded="visible"
+          @click="visible = !visible"
+        >
+          <svg class="vp-demo__code-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m8 9-3 3 3 3M16 9l3 3-3 3M14 5l-4 14" />
+          </svg>
           {{ visible ? '收起源码' : '查看源码' }}
-          <span :class="{ 'is-open': visible }">⌄</span>
+          <span class="vp-demo__chevron" :class="{ 'is-open': visible }">⌄</span>
         </button>
       </figcaption>
       <ElCollapseTransition>
