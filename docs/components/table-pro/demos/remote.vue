@@ -10,7 +10,7 @@
     :request="requestMembers"
     row-key="id"
     border
-    :pagination="{ pageSize: 4 }"
+    :pagination="{ pageSize: 10 }"
     @loaded="lastLoadedAt = new Date().toLocaleTimeString()"
   />
 
@@ -54,10 +54,10 @@ const requestMembers: TableProRequest<Member> = async ({ page, pageSize, signal 
     const query = keyword.value.trim()
     return !query || item.name.includes(query) || item.role.includes(query)
   })
-  const start = ((page ?? 1) - 1) * (pageSize ?? 4)
+  const start = ((page ?? 1) - 1) * (pageSize ?? 10)
 
   return {
-    data: matched.slice(start, start + (pageSize ?? 4)),
+    data: matched.slice(start, start + (pageSize ?? 10)),
     total: matched.length,
   }
 }
