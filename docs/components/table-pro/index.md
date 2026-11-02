@@ -6,6 +6,8 @@ description: 基于 Element Plus 的表格组件，支持列定义、分页和�
 import BasicDemo from './demos/basic.vue'
 import RemoteDemo from './demos/remote.vue'
 import SlotDemo from './demos/slots.vue'
+import HeaderDemo from './demos/header.vue'
+import GroupedHeaderDemo from './demos/grouped-header.vue'
 import EventsDemo from './demos/events.vue'
 </script>
 
@@ -160,7 +162,6 @@ interface Order {
   status: '正常' | '待确认'
 }
 
-const selected = ref('')
 const columns: TableProColumn<Order>[] = [
   { prop: 'number', label: '订单号', minWidth: 150 },
   { prop: 'amount', label: '金额', width: 120, align: 'right' },
@@ -187,12 +188,11 @@ const rows: Order[] = [
       </ElTag>
     </template>
     <template #actions="{ row }">
-      <ElButton link type="primary" @click="selected = row.name">
+      <ElButton link type="primary">
         查看
       </ElButton>
     </template>
   </ElTablePro>
-  <p v-if="selected">已选择：{{ selected }}</p>
 </template>
 ```
 
@@ -202,6 +202,10 @@ const rows: Order[] = [
 ### 自定义表头
 
 通过 `headerSlot` 替换表头内容：
+
+<Demo>
+  <HeaderDemo />
+  <template #code>
 
 ```vue
 <script setup lang="ts">
@@ -215,31 +219,51 @@ interface Task {
 
 const columns: TableProColumn<Task>[] = [
   { prop: 'title', label: '任务', minWidth: 180 },
-  {
-    prop: 'score',
-    label: '评分',
-    width: 120,
-    headerSlot: 'score-header',
-  },
+  { prop: 'score', label: '评分', width: 140, headerSlot: 'score-header' },
 ]
+
 const rows: Task[] = [
   { id: 1, title: '整理接口文档', score: 86 },
   { id: 2, title: '补充单元测试', score: 92 },
+  { id: 3, title: '优化表格性能', score: 78 },
 ]
 </script>
 
 <template>
-  <ElTablePro :columns="columns" :data="rows" row-key="id">
+  <ElTablePro :columns="columns" :data="rows" row-key="id" :pagination="false" border>
     <template #score-header>
-      <span style="color: var(--el-color-primary)">评分（百分制）</span>
+      <span class="custom-header">
+        <span>评分</span>
+        <small>百分制</small>
+      </span>
     </template>
   </ElTablePro>
 </template>
+
+<style scoped>
+.custom-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.custom-header small {
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  font-weight: 400;
+}
+</style>
 ```
+
+  </template>
+</Demo>
 
 ### 分组表头
 
 通过 `children` 配置多级表头：
+
+<Demo>
+  <GroupedHeaderDemo />
+  <template #code>
 
 ```vue
 <script setup lang="ts">
@@ -262,16 +286,21 @@ const columns: TableProColumn<Member>[] = [
     ],
   },
 ]
+
 const rows: Member[] = [
   { id: 1, name: '林晓', email: 'linxiao@example.com', phone: '13800000001' },
   { id: 2, name: '陈默', email: 'chenmo@example.com', phone: '13800000002' },
+  { id: 3, name: '周宁', email: 'zhouning@example.com', phone: '13800000003' },
 ]
 </script>
 
 <template>
-  <ElTablePro :columns="columns" :data="rows" row-key="id" border />
+  <ElTablePro :columns="columns" :data="rows" row-key="id" :pagination="false" border />
 </template>
 ```
+
+  </template>
+</Demo>
 
 ### 隐藏列
 
