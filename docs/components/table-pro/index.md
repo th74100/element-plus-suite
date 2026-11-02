@@ -295,7 +295,7 @@ const rows: Member[] = [
 </script>
 
 <template>
-  <ElTablePro :columns="columns" :data="rows" row-key="id" :pagination="false" border />
+  <ElTablePro :columns="columns" :data="rows" row-key="id" :pagination="false" />
 </template>
 ```
 
