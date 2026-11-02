@@ -22,6 +22,7 @@ import EventsDemo from './demos/events.vue'
 
 ```vue
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ElTablePro, type TableProColumn } from 'element-plus-suite'
 
 interface Member {
@@ -150,6 +151,7 @@ const requestMembers: TableProRequest<Member> = async ({
 
 ```vue
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ElTablePro, type TableProColumn } from 'element-plus-suite'
 
 interface Member {
@@ -183,6 +185,7 @@ const rows: Member[] = Array.from({ length: 25 }, (_, index) => ({
 
 ```vue
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ElTablePro, type TableProColumn } from 'element-plus-suite'
 
 interface Member {
@@ -217,6 +220,7 @@ const rows: Member[] = Array.from({ length: 25 }, (_, index) => ({
 
 ```vue
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ElTablePro, type TableProColumn } from 'element-plus-suite'
 
 interface Member {
@@ -259,6 +263,7 @@ const rows: Member[] = [
 
 ```vue
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ElTablePro, type TableProColumn } from 'element-plus-suite'
 
 interface Order {
@@ -275,13 +280,15 @@ const columns: TableProColumn<Order>[] = [
   { label: '操作', width: 140, fixed: 'right', slot: 'actions' },
 ]
 
+const selected = ref('')
+
 const rows: Order[] = [
   { id: 1, number: 'SO-2026-001', amount: 1280, status: '正常' },
   { id: 2, number: 'SO-2026-002', amount: 760, status: '待确认' },
 ]
 
-function edit(row: Order) {
-  console.log('编辑订单', row.number)
+function view(row: Order) {
+  selected.value = row.number
 }
 </script>
 
@@ -292,11 +299,13 @@ function edit(row: Order) {
     </template>
 
     <template #actions="{ row }">
-      <ElButton link type="primary" @click="edit(row)">
-        编辑
+      <ElButton link type="primary" @click="view(row)">
+        查看
       </ElButton>
     </template>
   </ElTablePro>
+
+  <p v-if="selected">已选择：{{ selected }}</p>
 </template>
 ```
 
@@ -378,3 +387,68 @@ function handleFilterChange(filters: Record<string, string[]>) {
 
   </template>
 </Demo>
+
+## 保留原生能力
+
+除了 `columns`、`request` 和 `pagination`，其余属性与事件都会交给内部 `ElTable`：
+
+```vue
+<script setup lang="ts">
+import { ElTablePro, type TableProColumn } from 'element-plus-suite'
+
+interface Member {
+  id: number
+  name: string
+  role: string
+}
+
+const columns: TableProColumn<Member>[] = [
+  { prop: 'name', label: '成员', minWidth: 140 },
+  { prop: 'role', label: '角色', minWidth: 180 },
+]
+
+const rows: Member[] = [
+  { id: 1, name: '林晓', role: '产品设计' },
+  { id: 2, name: '陈默', role: '前端开发' },
+]
+
+function handleRowClick(row: Member) {
+  console.log('点击行', row.name)
+}
+
+function handleSelectionChange(rows: Member[]) {
+  console.log('选中行', rows)
+}
+</script>
+
+<template>
+  <ElTablePro
+    :columns="columns"
+    :data="rows"
+    row-key="id"
+    border
+    stripe
+    height="420"
+    @row-click="handleRowClick"
+    @selection-change="handleSelectionChange"
+  />
+</template>
+```
+
+实例方法也直接代理到 `ElTable`。比如滚动、清除排序、清空选择都可以照常调用：
+
+```ts
+tableRef.value?.scrollTo({ top: 0 })
+tableRef.value?.clearSort()
+tableRef.value?.clearSelection()
+```
+
+想继续查看完整属性、事件和实例方法，可以阅读 [Props](/components/table-pro/props)、[Events](/components/table-pro/events) 和[实例方法](/components/table-pro/instance)。
+
+## API
+
+除了本页介绍和示例，完整参考按类型拆分为：
+
+- [Props](/components/table-pro/props)：组件自有属性和 ElTable 原生属性
+- [事件](/components/table-pro/events)：loaded、error 与原生事件透传
+- [实例方法](/components/table-pro/instance)：reload 与 ElTable 实例 API
