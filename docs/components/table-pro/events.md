@@ -9,7 +9,7 @@ ElTable 的原生事件都会透传到内部表格：
 ```vue
 <ElTablePro
   :columns="columns"
-  :data="rows"
+  :data="dataSource"
   row-key="id"
   @row-click="handleRowClick"
   @selection-change="handleSelectionChange"

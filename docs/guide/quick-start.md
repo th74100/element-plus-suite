@@ -27,7 +27,7 @@ const columns: TableProColumn<User>[] = [
 <script setup lang="ts">
 import { ElTablePro } from 'element-plus-suite'
 
-const rows = [
+const dataSource = [
   { id: 1, name: '林晓', email: 'linxiao@example.com' },
   { id: 2, name: '陈默', email: 'chenmo@example.com' },
 ]
@@ -36,7 +36,7 @@ const rows = [
 <template>
   <ElTablePro
     :columns="columns"
-    :data="rows"
+    :data="dataSource"
     row-key="id"
     :pagination="false"
   />

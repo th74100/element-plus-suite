@@ -167,7 +167,7 @@ const columns: TableProColumn<Order>[] = [
   { prop: 'status', label: '状态', width: 110, slot: 'status' },
   { label: '操作', width: 140, fixed: 'right', slot: 'actions' },
 ]
-const rows: Order[] = [
+const dataSource: Order[] = [
   { id: 1, number: 'SO-2026-001', amount: 1280, status: '正常' },
   { id: 2, number: 'SO-2026-002', amount: 760, status: '待确认' },
 ]
@@ -176,7 +176,7 @@ const rows: Order[] = [
 <template>
   <ElTablePro
     :columns="columns"
-    :data="rows"
+    :data="dataSource"
     row-key="id"
     :pagination="false"
   >
@@ -220,7 +220,7 @@ const columns: TableProColumn<Task>[] = [
   { prop: 'score', label: '评分', width: 140, headerSlot: 'score-header' },
 ]
 
-const rows: Task[] = [
+const dataSource: Task[] = [
   { id: 1, title: '整理接口文档', score: 86 },
   { id: 2, title: '补充单元测试', score: 92 },
   { id: 3, title: '优化表格性能', score: 78 },
@@ -228,7 +228,7 @@ const rows: Task[] = [
 </script>
 
 <template>
-  <ElTablePro :columns="columns" :data="rows" row-key="id" :pagination="false">
+  <ElTablePro :columns="columns" :data="dataSource" row-key="id" :pagination="false">
     <template #score-header>
       <span class="custom-header">
         <span>评分</span>
@@ -285,7 +285,7 @@ const columns: TableProColumn<Member>[] = [
   },
 ]
 
-const rows: Member[] = [
+const dataSource: Member[] = [
   { id: 1, name: '林晓', email: 'linxiao@example.com', phone: '13800000001' },
   { id: 2, name: '陈默', email: 'chenmo@example.com', phone: '13800000002' },
   { id: 3, name: '周宁', email: 'zhouning@example.com', phone: '13800000003' },
@@ -293,7 +293,7 @@ const rows: Member[] = [
 </script>
 
 <template>
-  <ElTablePro :columns="columns" :data="rows" row-key="id" :pagination="false" />
+  <ElTablePro :columns="columns" :data="dataSource" row-key="id" :pagination="false" />
 </template>
 ```
 
@@ -318,12 +318,12 @@ const columns: TableProColumn<Member>[] = [
   { prop: 'name', label: '成员', minWidth: 140 },
   { prop: 'email', label: '邮箱', minWidth: 220, visible: false },
 ]
-const rows: Member[] = [
+const dataSource: Member[] = [
   { id: 1, name: '林晓', email: 'linxiao@example.com' },
 ]
 </script>
 
 <template>
-  <ElTablePro :columns="columns" :data="rows" row-key="id" />
+  <ElTablePro :columns="columns" :data="dataSource" row-key="id" />
 </template>
 ```
