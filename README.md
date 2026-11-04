@@ -9,7 +9,7 @@
 ## 安装
 
 ```bash
-pnpm add element-plus-suite
+npm install element-plus-suite
 ```
 
 ## 使用
@@ -19,10 +19,12 @@ import { createApp } from 'vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import ElementPlusSuite from 'element-plus-suite'
+import App from './App.vue'
 
 const app = createApp(App)
 app.use(ElementPlus)
 app.use(ElementPlusSuite)
+app.mount('#app')
 ```
 
 按需导入：
