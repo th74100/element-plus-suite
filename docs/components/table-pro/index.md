@@ -581,7 +581,7 @@ const dataSource: Project[] = [
     :columns="columns"
     :data="dataSource"
     border
-    :mergeFields="['department', 'group']"
+    :merge-fields="['department', 'group']"
     row-key="id"
     :pagination="false"
   />
@@ -626,7 +626,7 @@ const dataSource: Project[] = [
   <ElTablePro
     :columns="columns"
     :data="dataSource"
-    :mergeFields="['department', 'group']"
+    :merge-fields="['department', 'group']"
     row-key="id"
     :pagination="false"
   />
