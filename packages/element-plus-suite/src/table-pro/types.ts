@@ -1,11 +1,85 @@
-import type { VNode } from 'vue'
-import type {
-  ElTable,
-  TableColumnCtx,
-  TableInstance,
-  TableProps,
-} from 'element-plus'
+import type { Ref, VNode, VNodeChild } from 'vue'
 
+/**
+ * 表格列在运行时由 Element Plus 提供。
+ * 这里只声明组件库会用到的公共字段，其余字段保持开放
+ */
+export interface TableProColumnContext<Row = any> {
+  id?: string
+  realWidth?: number | null
+  type?: string
+  label?: string
+  className?: string
+  labelClassName?: string
+  property?: string
+  prop?: string
+  width?: string | number
+  minWidth?: string | number
+  renderHeader?: (data: any) => VNode
+  sortable?: boolean | string
+  sortMethod?: (a: Row, b: Row) => number
+  sortBy?: string | ((row: Row, index: number, array?: Row[]) => string) | string[]
+  formatter?: (row: Row, column: TableProColumnContext<Row>, cellValue: any, index: number) => string | VNode
+  filters?: { text: string; value: string }[]
+  filteredValue?: string[]
+  children?: TableProColumnContext<Row>[]
+  [key: string]: any
+}
+
+export interface TableProTableStore {
+  states?: {
+    data?: Ref<any[]>
+    columns?: Ref<TableProColumnContext<any>[]>
+  }
+  [key: string]: any
+}
+
+/**
+ * 使用 Proxy 暴露 ElTable 实例能力。
+ */
+export interface TableProTableInstance {
+  store: TableProTableStore
+  setCurrentRow: (row: any) => void
+  getSelectionRows?: () => any
+  toggleRowSelection: (row: any, selected?: boolean) => void
+  clearSelection: () => void
+  clearFilter: (columnKeys?: string | string[]) => void
+  toggleAllSelection: () => void
+  toggleRowExpansion: (row: any, expanded?: boolean) => void
+  clearSort: () => void
+  doLayout: () => void
+  sort: (prop: string, order: string) => void
+  [key: string]: any
+}
+
+export interface TableProTreeProps {
+  hasChildren?: string
+  children?: string
+  [key: string]: any
+}
+
+export interface TableProSpanMethodParams<Row = any> {
+  row: Row
+  rowIndex: number
+  column: TableProColumnContext<Row>
+  columnIndex: number
+}
+
+export type TableProSpanMethodResult =
+  | number[]
+  | { rowspan: number; colspan: number }
+  | undefined
+
+export type TableProSpanMethod<Row = any> = (
+  params: TableProSpanMethodParams<Row>,
+) => TableProSpanMethodResult
+
+/** TablePro 使用的 ElTable 公共属性；其余原生属性通过开放索引接收。 */
+export interface TableProTableProps {
+  spanMethod?: TableProSpanMethod
+  treeProps?: TableProTreeProps
+  [key: string]: any
+}
 export interface TableProRequestParams {
   page: number | null
   pageSize: number | null
@@ -15,6 +89,19 @@ export interface TableProRequestParams {
 export interface TableProRequestResult<Row> {
   data: Row[]
   total: number
+}
+
+
+export interface TableProColumnHeaderRenderScope<Row extends Record<string, any>> {
+  column: TableProColumnContext<Row>
+  $index: number
+  store: TableProTableInstance['store']
+  _self: unknown
+}
+export interface TableProColumnRenderScope<Row> {
+  row: Row
+  column: TableProColumnContext<any>
+  $index: number
 }
 
 export type TableProRequest<Row> = (
@@ -41,10 +128,10 @@ type ElTableColumnProps = {
   showOverflowTooltip?: boolean | Record<string, any>
   tooltipFormatter?: (data: any) => string
   fixed?: boolean | string
-  formatter?: (row: any, column: TableColumnCtx<any>, cellValue: any, index: number) => string | VNode
+  formatter?: (row: any, column: TableProColumnContext<any>, cellValue: any, index: number) => string | VNode
   selectable?: (row: any, index: number) => boolean
   reserveSelection?: boolean
-  filterMethod?: (value: string, row: any, column: TableColumnCtx<any>) => void
+  filterMethod?: (value: string, row: any, column: TableProColumnContext<any>) => void
   filteredValue?: string[]
   filters?: { text: string; value: string }[]
   filterPlacement?: string
@@ -52,12 +139,19 @@ type ElTableColumnProps = {
   filterClassName?: string
   index?: number | ((index: number) => number)
   sortOrders?: ('ascending' | 'descending' | null)[]
+  [key: string]: any
 }
 
 export interface TableProColumnExtra<Row> {
   visible?: boolean
   slot?: string
   headerSlot?: string
+  /** 使用渲染函数生成单元格内容 */
+  render?: (scope: TableProColumnRenderScope<Row>) => VNodeChild
+  /** 使用渲染函数生成表头内容 */
+  headerRender?: (scope: TableProColumnHeaderRenderScope<Row & Record<string, any>>) => VNodeChild
+  /** 当前页内连续相同值时自动合并单元格 */
+  autoMerge?: boolean
   children?: TableProColumn<Row>[]
 }
 
@@ -67,10 +161,10 @@ export type TableProColumn<Row> =
     'prop' | 'children' | 'formatter'
   > &
     TableProColumnExtra<Row> & {
-      prop?: Extract<keyof Row, string>
+      prop?: string
       formatter?: (
         row: Row,
-        column: TableColumnCtx<any>,
+        column: TableProColumnContext<any>,
         cellValue: unknown,
         index: number,
       ) => string | VNode | undefined
@@ -88,9 +182,11 @@ export interface TableProOwnProps<Row> {
   columns?: TableProColumn<Row>[]
   request?: TableProRequest<Row>
   pagination?: boolean | TableProPagination
+  /** 按数组顺序逐级合并连续同值字段 */
+  mergeFields?: string[]
 }
 
-type ElTableProps = Partial<TableProps>
+type ElTableProps = Partial<TableProTableProps>
 
 export type TableProProps<
   Row extends Record<string, any>,
@@ -107,7 +203,7 @@ export interface TableProOwnInstance {
 }
 
 export type TableProInstance =
-  TableProOwnInstance & TableInstance
+  TableProOwnInstance & TableProTableInstance
 
 export const TABLE_PRO_DEFAULT_PAGINATION = {
   page: 1,
@@ -137,7 +233,4 @@ export function normalizePagination(
     ...config,
   }
 }
-
-
-
 

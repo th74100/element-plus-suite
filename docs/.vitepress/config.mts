@@ -1,5 +1,8 @@
 import { defineConfig } from 'vitepress'
 
+const isGitHubPages = process.env.GITHUB_ACTIONS === 'true'
+const publicPath = isGitHubPages ? '/element-plus-suite' : ''
+
 /**
  * VitePress 默认给 .vp-doc 下所有 table/tr/th/td 加样式，
  * 连 Demo 中 ElTable 的内部表格也会被命中。
@@ -28,6 +31,7 @@ function stripVitePressTableStyles() {
   }
 }
 export default defineConfig({
+  base: isGitHubPages ? '/element-plus-suite/' : '/',
   title: 'Element Plus Suite',
   description: '保留 ElTable 全部能力，同时减少表格页面中的重复代码。',
   lang: 'zh-CN',
@@ -35,50 +39,34 @@ export default defineConfig({
   vite: {
     plugins: [stripVitePressTableStyles()],
   },
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: publicPath + '/logo.svg' }],
+    ['link', { rel: 'apple-touch-icon', href: publicPath + '/apple-touch-icon.png' }],
+  ],
   themeConfig: {
+    logo: '/logo.svg',
     nav: [
-      { text: '指南', link: '/guide/introduction' },
-      { text: '组件', link: '/components/' },
+      { text: '指南', link: '/guide/' },
+      { text: '组件', link: '/components/table-pro/' },
     ],
     sidebar: {
       '/guide/': [
         {
-          text: '开始使用',
+          text: '介绍',
           items: [
-            { text: '为什么用它', link: '/guide/introduction' },
+            { text: '说明', link: '/guide/' },
             { text: '安装', link: '/guide/installation' },
             { text: '快速开始', link: '/guide/quick-start' },
           ],
         },
       ],
       '/components/': [
-        /*{
-          text: '组件总览',
-          items: [
-            { text: '全部组件', link: '/components/' },
-          ],
-        },*/
         {
           text: '数据展示',
           items: [
             { text: 'Table 表格', link: '/components/table-pro/' },
-            /*{ text: 'Props', link: '/components/table-pro/props' },
-            { text: 'Events', link: '/components/table-pro/events' },
-            { text: '实例方法', link: '/components/table-pro/instance' },*/
           ],
-        },
-        /*{
-          text: '表单',
-          items: [
-            { text: 'ElFormPro（规划中）', link: '/components/form/' },
-          ],
-        },
-        {
-          text: '基础',
-          items: [
-            { text: 'ElButton（规划中）', link: '/components/button/' },
-          ],
-        },*/
+        }
       ],
     },
     socialLinks: [

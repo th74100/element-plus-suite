@@ -6,6 +6,7 @@ import {
   onMounted,
   shallowRef,
   useSlots,
+  watch,
   withDirectives,
   type PropType,
 } from 'vue'
@@ -13,9 +14,10 @@ import {
   ElPagination,
   ElTable,
   vLoading,
-  type TableInstance,
+
 } from 'element-plus'
 import { renderTableColumns } from './render-columns'
+import { useTableMerge } from './composables/use-table-merge'
 import { useTablePagination } from './composables/use-table-pagination'
 import { useTableRequest } from './composables/use-table-request'
 import type {
@@ -24,6 +26,8 @@ import type {
   TableProPagination,
   TableProRequest,
   TableProRequestResult,
+  TableProTableInstance,
+  TableProTableProps,
 } from './types'
 
 export default defineComponent({
@@ -42,6 +46,10 @@ export default defineComponent({
       type: [Boolean, Object] as PropType<boolean | TableProPagination>,
       default: true,
     },
+    mergeFields: {
+      type: Array as PropType<string[]>,
+      default: () => [],
+    },
     data: {
       type: Array as PropType<any[]>,
       default: () => [],
@@ -59,7 +67,7 @@ export default defineComponent({
   },
   setup(props, { attrs, emit, expose }) {
     const slots = useSlots()
-    const tableRef = shallowRef<TableInstance | null>(null)
+    const tableRef = shallowRef<TableProTableInstance | null>(null)
     const remoteData = shallowRef<any[]>([])
     const remoteTotal = shallowRef(0)
 
@@ -73,7 +81,7 @@ export default defineComponent({
       return key
     })
 
-    const { loading: requestLoading, load } = useTableRequest<any>({
+    const { loading: requestLoading, load, cancel } = useTableRequest<any>({
       request: () => props.request,
       page: () => pagination.requestPage.value,
       pageSize: () => pagination.requestPageSize.value,
@@ -108,6 +116,16 @@ export default defineComponent({
         : (props.data?.length ?? 0),
     )
 
+    const { spanMethod } = useTableMerge({
+      tableRef,
+      columns: () => props.columns,
+      data: displayData,
+      mergeFields: () => props.mergeFields,
+      userSpanMethod: () => attrs.spanMethod as TableProTableProps['spanMethod'],
+      treeProps: () => attrs.treeProps as TableProTableProps['treeProps'],
+      lazy: () => Boolean(attrs.lazy),
+    })
+
     async function reload(options?: { page?: number }) {
       if (options?.page !== undefined) {
         pagination.currentPage.value = options.page
@@ -115,6 +133,32 @@ export default defineComponent({
       await load()
     }
 
+    watch(
+      () => props.request,
+      (request) => {
+        remoteData.value = []
+        remoteTotal.value = 0
+
+        if (request) {
+          void reload()
+        }
+        else {
+          cancel()
+        }
+      },
+    )
+
+    watch(
+      () => [
+        pagination.requestPage.value,
+        pagination.requestPageSize.value,
+      ] as const,
+      () => {
+        if (props.request) {
+          void reload()
+        }
+      },
+    )
 
     const exposed = new Proxy(
       {},
@@ -125,7 +169,7 @@ export default defineComponent({
           const table = tableRef.value
           if (!table) return undefined
 
-          const value = table[key as keyof TableInstance]
+          const value = table[key as keyof TableProTableInstance]
 
           return typeof value === 'function'
             ? value.bind(table)
@@ -154,6 +198,7 @@ export default defineComponent({
           ref: tableRef,
           data: displayData.value,
           rowKey: rowKeyValue.value,
+          spanMethod: spanMethod.value as any,
         },
         {
           default: () => renderTableColumns(props.columns, slots),
@@ -162,7 +207,7 @@ export default defineComponent({
         },
       )
 
-      return h('div', { class: 'element-plus-suite-table' }, [
+      return [
         withDirectives(tableVNode, [
           [vLoading, isLoading.value],
         ]),
@@ -176,28 +221,16 @@ export default defineComponent({
               ],
               layout: pagination.config.value?.layout,
               background: pagination.config.value?.background,
-              class: 'element-plus-suite-table__pagination',
               'onUpdate:currentPage': (page: number) => {
                 pagination.currentPage.value = page
               },
               'onUpdate:pageSize': (size: number) => {
                 pagination.setPageSize(size)
               },
-              onCurrentChange: () => {
-                void reload()
-              },
-              onSizeChange: (size: number) => {
-                pagination.setPageSize(size)
-                void reload()
-              },
             })
           : null,
-      ])
+      ]
     }
   },
 })
 </script>
-
-
-
-

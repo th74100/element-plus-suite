@@ -1,4 +1,4 @@
-import { computed, shallowRef } from 'vue'
+import { computed, shallowRef, watch } from 'vue'
 import {
   normalizePagination,
   type TableProPagination,
@@ -16,6 +16,19 @@ export function useTablePagination(
   // 默认页码和每页条数来自统一默认配置。
   const currentPage = shallowRef(config.value?.page ?? 1)
   const pageSize = shallowRef(config.value?.pageSize ?? 20)
+
+  watch(
+    () => config.value?.page,
+    (page) => {
+      if (page !== undefined) currentPage.value = page
+    },
+  )
+  watch(
+    () => config.value?.pageSize,
+    (size) => {
+      if (size !== undefined) pageSize.value = size
+    },
+  )
 
   const requestPage = computed(() =>
     config.value ? currentPage.value : null,

@@ -14,7 +14,7 @@ const columns: TableProColumn<Member>[] = [
     label: '联系方式',
     children: [
       { prop: 'email', label: '邮箱', minWidth: 220 },
-      { prop: 'phone', label: '电话', minWidth: 160 },
+      { prop: 'phone', label: '电话', minWidth: 160, sortable: true },
     ],
   },
 ]
@@ -27,5 +27,5 @@ const dataSource: Member[] = [
 </script>
 
 <template>
-  <ElTablePro :columns="columns" :data="dataSource" row-key="id" :pagination="false" />
+  <ElTablePro :columns="columns" :data="dataSource" row-key="id" :default-sort="{prop: 'phone', order: 'descending'}" :pagination="false" />
 </template>

@@ -20,39 +20,49 @@ export function renderTableColumns(
       visible: _visible,
       slot,
       headerSlot,
+      render,
+      headerRender,
+      autoMerge: _autoMerge,
       children,
-      formatter,
       ...rest
     } = column
-
     const columnProps: Record<string, any> = { ...rest }
 
-    // formatter 统一返回字符串，避免和 Element Plus 的 VNode 类型冲突。
-    if (formatter) {
-      columnProps.formatter = (
-        row: any,
-        col: any,
-        value: any,
-        index: number,
-      ) => {
-        const result = formatter(row, col, value, index)
-        return result == null ? '' : String(result)
-      }
-    }
-
-    // TablePro 的 slot 字段映射成 ElTableColumn 的具名插槽。
+    // 把 TablePro 的 slot 字段映射成 ElTableColumn 的具名插槽。
     const columnSlots: Record<string, (scope: any) => any> = {}
     const cellSlot = slot ? slots[slot] : undefined
     const header = headerSlot ? slots[headerSlot] : undefined
-    if (cellSlot) columnSlots.default = cellSlot as any
-    if (header) columnSlots.header = header as any
+    if (cellSlot) {
+      columnSlots.default = cellSlot as any
+    }
+    else if (render) {
+      columnSlots.default = (scope: any) =>
+        render({
+          row: scope.row,
+          column: scope.column,
+          $index: scope.$index,
+        })
+    }
+    if (header) {
+      columnSlots.header = header as any
+    }
+    else if (headerRender) {
+      columnSlots.header = (scope: any) =>
+        headerRender({
+          column: scope.column,
+          $index: scope.$index,
+          store: scope.store,
+          _self: scope._self,
+        })
+    }
 
     if (children?.length) {
-      return [
-        h(ElTableColumn, columnProps, {
-          default: () => renderTableColumns(children, slots),
-        }),
-      ]
+      const groupSlots: Record<string, (scope: any) => any> = {
+        default: () => renderTableColumns(children, slots),
+      }
+      if (columnSlots.header) groupSlots.header = columnSlots.header
+
+      return [h(ElTableColumn, columnProps, groupSlots)]
     }
 
     return [

@@ -43,8 +43,6 @@ const dataSource = [
 </template>
 ```
 
-到这里，组件只负责把 columns 转成列并交给 ElTable 渲染。没有请求，也没有额外状态。
-
 ## 接入远程请求
 
 把 data 换成 request：

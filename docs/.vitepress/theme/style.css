@@ -9,6 +9,10 @@
   --vp-home-hero-image-filter: blur(56px);
 }
 
+html:root {
+  --vp-sidebar-width: 288px;
+}
+
 .dark {
   --vp-c-brand-1: #8da2ff;
   --vp-c-brand-2: #7189ef;
@@ -20,16 +24,50 @@
 .VPHero .text { max-width: 760px; letter-spacing: -.035em; line-height: 1.16; }
 .VPHero .tagline { max-width: 650px; line-height: 1.75; }
 .VPHero .actions { padding-top: 12px; }
+/*
+ * 首页 Logo 使用大面积柔光：中心收敛、向外均匀消失，
+ * 不保留清晰边缘，避免看起来像普通的 Logo 阴影。
+ */
+.VPHero .image-container {
+  isolation: isolate;
+}
+.VPHero .image-bg {
+  width: min(760px, 100%);
+  height: min(760px, 100%);
+  background: radial-gradient(
+    circle,
+    rgba(66, 99, 235, .5) 0%,
+    rgba(108, 92, 231, .38) 26%,
+    rgba(155, 106, 223, .24) 50%,
+    transparent 78%
+  );
+  filter: blur(56px);
+}
+.VPHero .image-src {
+  filter: drop-shadow(0 16px 28px rgba(66, 99, 235, .16));
+}
+.dark .VPHero .image-bg {
+  background: radial-gradient(
+    circle,
+    rgb(141 162 255 / 40%) 0%,
+    rgb(118 105 240 / 20%) 26%,
+    rgb(155 106 223 / 58%) 50%,
+    #0000003b 78%
+  );
+}
+.dark .VPHero .image-src {
+  filter: drop-shadow(0 18px 32px rgba(108, 92, 231, .22));
+}
 
 .vp-demo {
   margin: 26px 0 34px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 16px;
+  border-radius: 0;
   overflow: hidden;
   background: var(--vp-c-bg);
   box-shadow: 0 12px 38px rgba(24, 39, 75, .06);
 }
-.vp-demo__preview { padding: 24px; overflow-x: auto; }
+.vp-demo__preview { padding: 15px; overflow-x: auto; }
 .vp-demo__bar {
   display: flex;
   align-items: center;
@@ -121,29 +159,161 @@
   .demo-toolbar { flex-wrap: wrap; }
 }
 
-/* 组件文档：让左侧分组更像组件目录，分组标题更醒目。 */
-.VPSidebar .group:has(.VPSidebarItem.level-1.is-active) > .VPSidebarItem > .item .text {
-  color: var(--vp-c-brand-1);
+/*
+ * 侧边栏采用“分组标题 + 纯文本链接”的结构：
+ * 不显示左侧竖线，不使用胶囊背景，仅通过字重、行距和文字颜色区分层级。
+ */
+.VPSidebar .nav {
+  padding: 4px 2px 0;
 }
+
+/* 顶部分组标题 */
+.VPSidebarItem.level-0 > .item > .text {
+  padding: 0 0 8px;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 24px;
+  letter-spacing: -.01em;
+}
+
+.VPSidebarItem.level-0 {
+  padding-bottom: 14px;
+}
+
+/* 子项链接：宽松行高，不使用背景块 */
 .VPSidebarItem.is-link > .item > .link {
   box-sizing: border-box;
-  margin: 2px -8px;
-  padding: 2px 8px;
-  border-radius: 7px;
-  transition: background-color .18s ease;
+  min-height: 36px;
+  margin: 0;
+  padding: 5px 0;
+  border-radius: 0;
+  transition: none;
+}
+.VPSidebarItem.is-link > .item > .link > .text {
+  padding: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
 }
 .VPSidebarItem.is-link > .item > .link:hover {
-  background: var(--vp-c-brand-soft);
+  background: transparent;
 }
-.VPSidebarItem.is-link.is-active > .item > .link {
-  background: var(--vp-c-brand-soft);
+.VPSidebarItem.is-link > .item > .link:hover > .text {
+  color: var(--vp-c-brand-1);
 }
-.VPSidebarItem.level-1 > .item > .link > .text {
-  font-weight: 550;
+.VPSidebarItem.is-link.is-active > .item > .link > .text {
+  color: var(--vp-c-text-1);
+  font-weight: 500;
+}
+
+/* 参考图的目录没有缩进竖线，子项与分组标题保持同一左边界 */
+.VPSidebarItem.level-1 .items,
+.VPSidebarItem.level-2 .items,
+.VPSidebarItem.level-3 .items,
+.VPSidebarItem.level-4 .items,
+.VPSidebarItem.level-5 .items {
+  border-left: 0;
+  padding-left: 0;
+}
+
+/* 去掉活动子项左侧的竖条 */
+.VPSidebarItem.level-2.is-active > .item > .indicator,
+.VPSidebarItem.level-3.is-active > .item > .indicator,
+.VPSidebarItem.level-4.is-active > .item > .indicator,
+.VPSidebarItem.level-5.is-active > .item > .indicator {
+  background-color: transparent;
 }
 
 @media (min-width: 960px) {
   .VPSidebar {
-    padding-top: 22px;
+    padding-top: 30px;
+    padding-bottom: 56px;
+  }
+}/* API 表格中的类型提示 */
+.vp-doc .api-type {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 6px;
+  border-radius: 5px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  font-size: 12px;
+}
+.vp-doc .api-type__name {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+}
+.vp-doc .api-type__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--vp-c-text-3);
+  font: inherit;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .18s ease, border-color .18s ease, background-color .18s ease;
+}
+.vp-doc .api-type__trigger:hover,
+.vp-doc .api-type__trigger:focus-visible {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  outline: none;
+}
+.api-type-popover {
+  max-width: calc(100vw - 32px);
+}
+.vp-doc .api-type__signature {
+  max-width: min(720px, calc(100vw - 64px));
+  margin: 0;
+  overflow-x: auto;
+  color: var(--vp-c-text-1);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.vp-doc .api-type__signature .shiki {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 12px;
+}
+/* 弹层会被 teleport 到 body，需要单独清除 shiki 默认的上下外边距。 */
+.api-type-popover .api-type__signature .shiki {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.vp-doc .api-type__signature .shiki code {
+  background: transparent;
+  font-size: inherit;
+}
+/*
+ * VitePress 在 1440px 以上会用 100vw 计算侧边栏和导航边界。
+ * 100vw 包含滚动条宽度，页面变长后两者会出现竖向断层。
+ * 改用 100% 的页面可用宽度，让头部和侧边栏始终共用同一条边界。
+ */
+@media (min-width: 1440px) {
+  .VPNavBar.has-sidebar .title,
+  .VPSidebar {
+    width: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px);
+  }
+
+  .VPNavBar.has-sidebar .content {
+    padding-right: calc((100% - var(--vp-layout-max-width)) / 2 + 32px);
+    padding-left: calc((100% - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+  }
+
+  .VPNavBar.has-sidebar .divider {
+    padding-left: calc((100% - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
   }
 }

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Element Plus Suite</title>
+  <desc id="desc">三层组件面板组成的 Element Plus Suite 标志</desc>
+  <defs>
+    <linearGradient id="suite-gradient" x1="7" y1="4" x2="57" y2="61" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4263EB"/>
+      <stop offset=".52" stop-color="#6C5CE7"/>
+      <stop offset="1" stop-color="#9B6ADF"/>
+    </linearGradient>
+    <linearGradient id="panel-shine" x1="17" y1="25" x2="47" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F6F7FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#suite-gradient)"/>
+  <path d="M19 3h26a15 15 0 0 1 15 15v2H4v-2A15 15 0 0 1 19 3Z" fill="#FFFFFF" fill-opacity=".08"/>
+  <rect x="20" y="12" width="27" height="12" rx="4" fill="#FFFFFF" fill-opacity=".28"/>
+  <rect x="15" y="19" width="35" height="14" rx="5" fill="#FFFFFF" fill-opacity=".54"/>
+  <rect x="10" y="27" width="44" height="22" rx="6" fill="url(#panel-shine)"/>
+  <rect x="16" y="33" width="8" height="4" rx="2" fill="#4263EB"/>
+  <rect x="28" y="33" width="20" height="4" rx="2" fill="#C8D0FF"/>
+  <rect x="16" y="40" width="8" height="4" rx="2" fill="#6C5CE7"/>
+  <rect x="28" y="40" width="14" height="4" rx="2" fill="#D7CCFF"/>
+</svg>

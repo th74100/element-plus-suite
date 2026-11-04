@@ -5,7 +5,7 @@
         <slot />
       </div>
       <figcaption class="vp-demo__bar">
-        <span>示例</span>
+        <span>源码</span>
         <button
           type="button"
           class="vp-demo__toggle"

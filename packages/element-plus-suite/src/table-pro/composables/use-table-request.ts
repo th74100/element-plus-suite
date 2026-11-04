@@ -71,9 +71,13 @@ export function useTableRequest<Row>(
     }
   }
 
-  onBeforeUnmount(() => {
+  function cancel() {
     controller?.abort()
-  })
+    requestId += 1
+    loading.value = false
+  }
 
-  return { loading, load }
+  onBeforeUnmount(cancel)
+
+  return { loading, load, cancel }
 }
