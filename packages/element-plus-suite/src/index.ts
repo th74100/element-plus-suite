@@ -1,3 +1,4 @@
+import './table-pro/style.css'
 import type { App } from 'vue'
 import { ElTablePro } from './table-pro'
 

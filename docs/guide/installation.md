@@ -31,6 +31,7 @@ yarn add element-plus-suite
 ```ts
 import { createApp } from 'vue'
 import ElementPlusSuite from 'element-plus-suite'
+import 'element-plus-suite/dist/index.css'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -43,4 +44,24 @@ app.mount('#app')
 
 ```ts
 import { ElTablePro } from 'element-plus-suite'
+import 'element-plus-suite/dist/index.css'
+```
+
+> 组件库样式需要单独引入，推荐放在应用入口文件 `main.ts`。
+
+## 一起注册 Element Plus
+
+```ts
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import ElementPlusSuite from 'element-plus-suite'
+import 'element-plus-suite/dist/index.css'
+import App from './App.vue'
+
+const app = createApp(App)
+
+app.use(ElementPlus)
+app.use(ElementPlusSuite)
+app.mount('#app')
 ```

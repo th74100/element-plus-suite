@@ -207,11 +207,14 @@ export default defineComponent({
         },
       )
 
-      return [
-        withDirectives(tableVNode, [
-          [vLoading, isLoading.value],
-        ]),
-        pagination.enabled.value
+      return h(
+        'div',
+        { class: 'el-table-pro' },
+        [
+          withDirectives(tableVNode, [
+            [vLoading, isLoading.value],
+          ]),
+          pagination.enabled.value
           ? h(ElPagination, {
               currentPage: pagination.currentPage.value,
               pageSize: pagination.pageSize.value,
@@ -228,8 +231,9 @@ export default defineComponent({
                 pagination.setPageSize(size)
               },
             })
-          : null,
-      ]
+            : null,
+        ],
+      )
     }
   },
 })

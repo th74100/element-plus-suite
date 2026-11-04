@@ -1,6 +1,6 @@
 {
   "name": "element-plus-suite",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Unofficial enhancement components for Element Plus",
   "license": "MIT",
   "repository": {
@@ -9,7 +9,9 @@
   },
   "homepage": "https://th74100.github.io/element-plus-suite/",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "files": [
     "dist"
   ],
@@ -21,7 +23,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./dist/index.css": "./dist/index.css"
   },
   "scripts": {
     "build": "vite build",

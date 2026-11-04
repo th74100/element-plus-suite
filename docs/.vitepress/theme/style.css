@@ -149,9 +149,19 @@ html:root {
 .vp-doc table:not(.el-table table) td {
   font-size: 14px;
 }
+/*
+ * VitePress 会给 .vp-doc 内的 ul/ol 添加 padding、margin 和 list-style，
+ * 这些规则也会命中 Element Plus 分页器。这里只恢复分页器自身的列表表现。
+ */
 .vp-doc .el-pagination ul,
 .vp-doc .el-pagination ol {
-  padding-left: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vp-doc .el-pagination li {
+  margin: 0;
 }
 
 @media (max-width: 760px) {
