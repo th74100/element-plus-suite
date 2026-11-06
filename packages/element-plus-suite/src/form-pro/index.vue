@@ -466,6 +466,9 @@ export default defineComponent({
             {
               'is-required': item.formItemProps?.required
                 ?? hasRequiredChild(item),
+              'is-no-asterisk': formConfig.hideRequiredAsterisk,
+              'asterisk-right': formConfig.requireAsteriskPosition === 'right',
+              'asterisk-left': formConfig.requireAsteriskPosition !== 'right',
             },
           ],
           style: item.style,

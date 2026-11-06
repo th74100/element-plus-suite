@@ -530,7 +530,7 @@ describe('ElFormPro children', () => {
     })
   })
 
-  it('children 必填时父级显示星号，但只校验配置了 rules 的子字段', async () => {
+  it('children 必填时父级使用 Element Plus 星号 class，但只校验配置了 rules 的子字段', async () => {
     const wrapper = mount(ElFormPro, {
       props: {
         schema: [{
@@ -556,7 +556,7 @@ describe('ElFormPro children', () => {
     })
 
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.el-form-pro__group.is-required').exists()).toBe(true)
+    expect(wrapper.find('.el-form-pro__group.is-required.asterisk-left').exists()).toBe(true)
 
     const items = wrapper.findAllComponents({ name: 'ElFormItem' })
     expect(items.map(item => item.props('prop'))).toEqual(['date1', 'date2'])
@@ -567,6 +567,29 @@ describe('ElFormPro children', () => {
     expect(wrapper.text()).not.toContain('activityTime is required')
     expect(wrapper.text()).not.toContain('请选择活动时间')
   })
+  it('组合字段星号遵循 requireAsteriskPosition 和 hideRequiredAsterisk', () => {
+    const wrapper = mount(ElFormPro, {
+      props: {
+        schema: [{
+          label: '活动时间',
+          children: [
+            { key: 'date1', type: 'input', rules: [{ required: true }] },
+          ],
+        }],
+        formConfig: {
+          requireAsteriskPosition: 'right',
+          hideRequiredAsterisk: true,
+          buttons: { submit: false, reset: false },
+        },
+      },
+    })
+
+    const group = wrapper.find('.el-form-pro__group')
+    expect(group.classes()).toContain('is-required')
+    expect(group.classes()).toContain('asterisk-right')
+    expect(group.classes()).toContain('is-no-asterisk')
+  })
+
   it('组合字段容器可以省略 key', async () => {
     const wrapper = mount(ElFormPro, {
       props: {
