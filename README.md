@@ -36,7 +36,7 @@ import { ElFormPro, ElTablePro } from 'element-plus-suite'
 import 'element-plus-suite/dist/index.css'
 ```
 
-两个组件都支持通过 `v-model` 绑定数据，详细 API 和示例请查看[组件文档](https://th74100.github.io/element-plus-suite/)。
+详细 API 和示例请查看[组件文档](https://th74100.github.io/element-plus-suite/)。
 
 ## 开发
 
