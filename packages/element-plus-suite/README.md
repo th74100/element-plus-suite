@@ -58,7 +58,7 @@ app.mount('#app')
 也可以按需导入：
 
 ```ts
-import { ElTablePro } from 'element-plus-suite'
+import { ElFormPro, ElTablePro } from 'element-plus-suite'
 ```
 
 ## 快速开始
@@ -94,59 +94,28 @@ const dataSource: User[] = [
 </template>
 ```
 
-## 远程数据
+更多用法请查看[文档](https://th74100.github.io/element-plus-suite/components/table-pro/)
 
-将 `data` 换成 `request` 即可接入远程数据。`request` 接收当前分页参数和取消信号，并返回统一的数据结构：
-
-```ts
-import type { TableProRequest } from 'element-plus-suite'
-
-const requestUsers: TableProRequest<User> = async ({
-  page,
-  pageSize,
-  signal,
-}) => {
-  const params = new URLSearchParams({
-    page: String(page ?? 1),
-    pageSize: String(pageSize ?? 20),
-  })
-  const response = await fetch(`/api/users?${params}`, { signal })
-  const payload = await response.json()
-
-  return {
-    data: payload.list,
-    total: payload.total,
-  }
-}
-```
-
-接口的原始返回结构在 `request` 内部适配即可，组件只接收 `data` 和 `total`。
-
-更多用法请查看[文档](https://th74100.github.io/element-plus-suite/)。
-
-## License
-
-MIT
 ## ElFormPro
 
 `ElFormPro` 是基于 schema 的 Element Plus 表单组件：
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElFormPro, type FormProSchemaItem } from 'element-plus-suite'
 
-const formData = ref({
-  keyword: '',
-  status: '',
-})
-
 const schema: FormProSchemaItem[] = [
-  { key: 'keyword', label: '关键词', type: 'input', col: { span: 8 } },
+  {
+    key: 'keyword',
+    label: '关键词',
+    defaultValue: '',
+    col: { span: 8 },
+  },
   {
     key: 'status',
     label: '状态',
     type: 'select',
+    defaultValue: 'active',
     col: { span: 8 },
     fieldProps: {
       options: [
@@ -163,52 +132,17 @@ const schema: FormProSchemaItem[] = [
 </script>
 
 <template>
-  <ElFormPro v-model="formData" :schema="schema" />
+  <ElFormPro
+    :schema="schema"
+    :form-config="{
+      labelWidth: 120,
+    }"
+  />
 </template>
 ```
 
-## 高级筛选
+更多用法请查看[文档](https://th74100.github.io/element-plus-suite/components/form-pro/)
 
-`ElTablePro` 可以通过 `filter` 组合 `ElFormPro`：
+## License
 
-```vue
-<ElTablePro
-  :columns="columns"
-  :request="requestUsers"
-  :filter="{
-    schema: filterSchema,
-    model: filters,
-    formConfig: {
-      showCollapseButton: true,
-      collapseRows: 1,
-    },
-  }"
-  row-key="id"
-/>
-```
-
-筛选草稿与已应用条件分离。点击查询后才应用条件并回到第一页；切换分页时继续使用已应用条件。
-
-`request` 会收到统一参数：
-
-```ts
-const requestUsers: TableProRequest<User, UserQuery> = async ({
-  page,
-  pageSize,
-  query,
-  signal,
-}) => {
-  const params = new URLSearchParams({
-    page: String(page ?? 1),
-    pageSize: String(pageSize ?? 20),
-    keyword: query.keyword,
-  })
-  const response = await fetch(`/api/users?${params}`, { signal })
-  const payload = await response.json()
-
-  return {
-    data: payload.list,
-    total: payload.total,
-  }
-}
-```
+MIT
