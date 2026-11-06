@@ -4,7 +4,8 @@
 
 ## 组件
 
-`ElTablePro` 的诞生是为了解决项目中需要写很多 Table 的样板代码的问题，所以在其中封装了很多常用的逻辑。这些封装可以简单的分类为预设行为与预设逻辑。
+- `ElTablePro`：在 Element Plus Table 基础上封装分页、远程请求、筛选、单元格合并等常用能力，减少表格页面的样板代码。
+- `ElFormPro`：基于 schema 配置生成表单，内置栅格布局、组合字段、校验、按钮和自定义插槽能力，适合快速搭建查询表单和业务表单。
 
 ## 安装
 
@@ -31,9 +32,11 @@ app.mount('#app')
 按需导入：
 
 ```ts
-import { ElTablePro } from 'element-plus-suite'
+import { ElFormPro, ElTablePro } from 'element-plus-suite'
 import 'element-plus-suite/dist/index.css'
 ```
+
+两个组件都支持通过 `v-model` 绑定数据，详细 API 和示例请查看[组件文档](https://th74100.github.io/element-plus-suite/)。
 
 ## 开发
 
