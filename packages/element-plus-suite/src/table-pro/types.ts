@@ -1,4 +1,5 @@
 import type { Ref, VNode, VNodeChild } from 'vue'
+import type { FormProConfig, FormProSchemaItem } from '../form-pro/types'
 
 /**
  * 表格列在运行时由 Element Plus 提供。
@@ -80,9 +81,10 @@ export interface TableProTableProps {
   treeProps?: TableProTreeProps
   [key: string]: any
 }
-export interface TableProRequestParams {
+export interface TableProRequestParams<Query = Record<string, any>> {
   page: number | null
   pageSize: number | null
+  query: Query
   signal: AbortSignal
 }
 
@@ -104,8 +106,11 @@ export interface TableProColumnRenderScope<Row> {
   $index: number
 }
 
-export type TableProRequest<Row> = (
-  params: TableProRequestParams,
+export type TableProRequest<
+  Row,
+  Query = Record<string, any>,
+> = (
+  params: TableProRequestParams<Query>,
 ) => Promise<TableProRequestResult<Row>>
 
 type ElTableColumnProps = {
@@ -174,24 +179,48 @@ export interface TableProPagination {
   page?: number
   pageSize?: number
   pageSizes?: number[]
+  pagerCount?: number
   layout?: string
   background?: boolean
 }
 
-export interface TableProOwnProps<Row> {
+export interface TableProFilterConfigExtension extends FormProConfig {
+  /** 是否显示筛选表单的展开/收起按钮 */
+  showCollapseButton?: boolean
+  /** 收起时显示的行数，默认 1 */
+  collapseRows?: number
+  /** 收起时显示的字段数量；设置后优先于 collapseRows */
+  collapseCount?: number
+  /** 是否默认收起；显示折叠按钮时默认 true */
+  collapsed?: boolean
+}
+
+export interface TableProFilterConfig<Query = Record<string, any>> {
+  schema: FormProSchemaItem[]
+  formConfig?: TableProFilterConfigExtension
+  model?: Query
+  defaultValue?: Query
+}
+
+export interface TableProOwnProps<Row, Query = Record<string, any>> {
   columns?: TableProColumn<Row>[]
-  request?: TableProRequest<Row>
+  request?: TableProRequest<Row, Query>
   pagination?: boolean | TableProPagination
-  /** 按数组顺序逐级合并连续同值字段 */
+  /** 按数组顺序依次合并连续同值字段 */
   mergeFields?: string[]
+  /** 已应用的检索条件对象 */
+  query?: Query
+  /** 可选的筛选表单配置 */
+  filter?: TableProFilterConfig<Query>
 }
 
 type ElTableProps = Partial<TableProTableProps>
 
 export type TableProProps<
   Row extends Record<string, any>,
+  Query = Record<string, any>,
 > = Omit<ElTableProps, 'data' | 'rowKey'> &
-  TableProOwnProps<Row> & {
+  TableProOwnProps<Row, Query> & {
     data?: Row[]
     rowKey:
       | (keyof Row & string)
@@ -200,6 +229,8 @@ export type TableProProps<
 
 export interface TableProOwnInstance {
   reload: (options?: { page?: number }) => Promise<void>
+  search: () => Promise<void>
+  resetFilter: () => Promise<void>
 }
 
 export type TableProInstance =
@@ -209,6 +240,7 @@ export const TABLE_PRO_DEFAULT_PAGINATION = {
   page: 1,
   pageSize: 20,
   pageSizes: [10, 20, 50, 100],
+  pagerCount: 5,
   layout: 'total, sizes, prev, pager, next, jumper',
   background: true,
 } as const
@@ -217,6 +249,7 @@ export type ResolvedTableProPagination = {
   page: number
   pageSize: number
   pageSizes: readonly number[]
+  pagerCount: number
   layout: string
   background: boolean
 }
@@ -233,4 +266,3 @@ export function normalizePagination(
     ...config,
   }
 }
-

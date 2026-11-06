@@ -1,18 +1,5 @@
 <template>
-  <div class="demo-toolbar">
-    <ElInput
-      v-model="keyword"
-      placeholder="搜索姓名或邮箱"
-      clearable
-      @keyup.enter="search"
-    />
-    <ElButton type="primary" @click="search">
-      查询
-    </ElButton>
-  </div>
-
   <ElTablePro
-    ref="tableRef"
     :columns="columns"
     :request="requestUsers"
     row-key="id"
@@ -21,11 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
 import {
   ElTablePro,
   type TableProColumn,
-  type TableProInstance,
   type TableProRequest,
 } from 'element-plus-suite'
 
@@ -50,9 +35,6 @@ interface UserResponse {
 
 const USER_API = 'https://dummyjson.com/users'
 
-const keyword = ref('')
-const tableRef = shallowRef<TableProInstance>()
-
 const columns: TableProColumn<User>[] = [
   { prop: 'id', label: 'ID', width: 80 },
   { prop: 'firstName', label: '名', minWidth: 120 },
@@ -68,8 +50,7 @@ const requestUsers: TableProRequest<User> = async ({
   pageSize,
   signal,
 }) => {
-  const query = keyword.value.trim()
-  const limit = pageSize ?? 5
+  const limit = pageSize ?? 10
   const skip = ((page ?? 1) - 1) * limit
   const params = new URLSearchParams({
     limit: String(limit),
@@ -77,12 +58,7 @@ const requestUsers: TableProRequest<User> = async ({
     select: 'id,firstName,lastName,email,age,company',
   })
 
-  const url = new URL(query ? `${USER_API}/search` : USER_API)
-  if (query) url.searchParams.set('q', query)
-
-  for (const [key, value] of params) url.searchParams.set(key, value)
-
-  const response = await fetch(url, { signal })
+  const response = await fetch(`${USER_API}?${params}`, { signal })
 
   if (!response.ok) {
     throw new Error(`请求失败：${response.status}`)
@@ -94,9 +70,5 @@ const requestUsers: TableProRequest<User> = async ({
     data: payload.users,
     total: payload.total,
   }
-}
-
-function search() {
-  void tableRef.value?.reload({ page: 1 })
 }
 </script>

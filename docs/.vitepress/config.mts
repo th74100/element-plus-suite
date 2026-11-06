@@ -36,6 +36,12 @@ export default defineConfig({
   description: '保留 ElTable 全部能力，同时减少表格页面中的重复代码。',
   lang: 'zh-CN',
   cleanUrls: true,
+  markdown: {
+    theme: {
+      light: 'one-light',
+      dark: 'one-dark-pro',
+    },
+  },
   vite: {
     plugins: [stripVitePressTableStyles()],
   },
@@ -65,6 +71,7 @@ export default defineConfig({
           text: '数据展示',
           items: [
             { text: 'Table 表格', link: '/components/table-pro/' },
+            { text: 'Form 表单', link: '/components/form-pro/' },
           ],
         }
       ],

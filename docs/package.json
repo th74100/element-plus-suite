@@ -9,6 +9,7 @@
     "preview": "vitepress preview ."
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
     "element-plus": "^2.11.7",
     "element-plus-suite": "workspace:*",
     "shiki": "^2.1.0",

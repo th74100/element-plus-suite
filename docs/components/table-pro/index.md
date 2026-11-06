@@ -4,6 +4,8 @@ description: 基于 Element Plus 的表格组件，支持列定义、分页和�
 ---
 <script setup lang="ts">
 import BasicDemo from './demos/basic.vue'
+import FilteredDemo from './demos/filtered.vue'
+import FilterSlotDemo from './demos/filter-slot.vue'
 import RemoteDemo from './demos/remote.vue'
 import SlotDemo from './demos/slots.vue'
 import HeaderDemo from './demos/header.vue'
@@ -66,19 +68,26 @@ const dataSource: Member[] = [
 
 ## 请求数据源
 
-`request` 是 ElTablePro 最重要的 API。它接收 `page`、`pageSize` 和 `signal`，返回值必须包含 `data` 与 `total`，其中 `total` 表示接口总条数。
+`request` 是 ElTablePro 最重要的 API。它接收 `page`、`pageSize` 和 `signal`，返回值必须包含 `data` 与 `total`。
 
 <Demo>
   <RemoteDemo />
   <template #code>
 
 ```vue
+<template>
+  <ElTablePro
+    :columns="columns"
+    :request="requestUsers"
+    row-key="id"
+    :pagination="{ pageSize: 10, layout: 'total, prev, pager, next' }"
+  />
+</template>
+
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
 import {
   ElTablePro,
   type TableProColumn,
-  type TableProInstance,
   type TableProRequest,
 } from 'element-plus-suite'
 
@@ -94,18 +103,7 @@ interface User {
   }
 }
 
-interface UserResponse {
-  users: User[]
-  total: number
-  skip: number
-  limit: number
-}
-
 const USER_API = 'https://dummyjson.com/users'
-
-const keyword = ref('')
-const lastLoadedAt = ref('')
-const tableRef = shallowRef<TableProInstance>()
 
 const columns: TableProColumn<User>[] = [
   { prop: 'id', label: 'ID', width: 80 },
@@ -122,8 +120,7 @@ const requestUsers: TableProRequest<User> = async ({
   pageSize,
   signal,
 }) => {
-  const query = keyword.value.trim()
-  const limit = pageSize ?? 5
+  const limit = pageSize ?? 10
   const skip = ((page ?? 1) - 1) * limit
   const params = new URLSearchParams({
     limit: String(limit),
@@ -131,56 +128,359 @@ const requestUsers: TableProRequest<User> = async ({
     select: 'id,firstName,lastName,email,age,company',
   })
 
-  const url = new URL(query ? `${USER_API}/search` : USER_API)
-  if (query) url.searchParams.set('q', query)
-
-  for (const [key, value] of params) url.searchParams.set(key, value)
-
-  const response = await fetch(url, { signal })
+  const response = await fetch(`${USER_API}?${params}`, { signal })
 
   if (!response.ok) {
     throw new Error(`请求失败：${response.status}`)
   }
 
-  const payload = await response.json() as UserResponse
+  const payload = await response.json()
 
   return {
     data: payload.users,
     total: payload.total,
   }
 }
-
-function search() {
-  void tableRef.value?.reload({ page: 1 })
-}
 </script>
-
-<template>
-  <div class="demo-toolbar">
-    <ElInput
-      v-model="keyword"
-      placeholder="搜索姓名或邮箱"
-      clearable
-      @keyup.enter="search"
-    />
-    <ElButton type="primary" @click="search">
-      查询
-    </ElButton>
-  </div>
-
-  <ElTablePro
-    ref="tableRef"
-    :columns="columns"
-    :request="requestUsers"
-    row-key="id"
-    :pagination="{ pageSize: 10 }"
-  />
-</template>
 ```
 
   </template>
 </Demo>
 
+## 高级筛选
+
+通过 `filter` 配置开启
+
+<Demo>
+  <FilteredDemo />
+  <template #code>
+
+```vue
+<template>
+  <ElTablePro
+    :columns="columns"
+    :request="requestProducts"
+    :filter="filter"
+    row-key="id"
+    :pagination="{ pageSize: 10, layout: 'total, prev, pager, next' }"
+  />
+</template>
+
+<script setup lang="ts">
+import {
+  ElTablePro,
+  type TableProColumn,
+  type TableProFilterConfig,
+  type TableProRequest,
+} from 'element-plus-suite'
+
+interface Product {
+  id: number
+  title: string
+  category: string
+  brand: string
+  price: number
+  rating: number
+  stock: number
+  meta: {
+    updatedAt: string
+  }
+}
+
+interface ProductQuery {
+  keyword: string
+  category: string
+  modifiedAfter: string
+}
+
+interface ProductResponse {
+  products: Product[]
+  total: number
+}
+
+const PRODUCT_API = 'https://dummyjson.com/products'
+
+const columns: TableProColumn<Product>[] = [
+  { prop: 'id', label: 'ID', width: 80 },
+  { prop: 'title', label: '商品名称', minWidth: 240, showOverflowTooltip: true },
+  { prop: 'category', label: '分类', minWidth: 150 },
+  { prop: 'brand', label: '品牌', minWidth: 130 },
+  {
+    prop: 'price',
+    label: '价格',
+    width: 100,
+    formatter: (_row, _column, value) => `$${value}`,
+  },
+  { prop: 'rating', label: '评分', width: 90 },
+  {
+    prop: 'meta.updatedAt',
+    label: '最后修改',
+    minWidth: 180,
+    formatter: (_row, _column, value) => new Date(value).toLocaleString(),
+  },
+]
+
+const filter: TableProFilterConfig<ProductQuery> = {
+  schema: [
+    {
+      key: 'keyword',
+      label: '商品名称',
+      defaultValue: '',
+      col: { span: 8 },
+      fieldProps: { placeholder: '搜索商品名称' },
+    },
+    {
+      key: 'category',
+      label: '分类',
+      type: 'select',
+      defaultValue: '',
+      col: { span: 8 },
+      fieldProps: {
+        options: [
+          { name: '美妆', id: 'beauty' },
+          { name: '香水', id: 'fragrances' },
+          { name: '家具', id: 'furniture' },
+          { name: '食品', id: 'groceries' },
+        ],
+        props: {
+          label: 'name',
+          value: 'id',
+        },
+      },
+    },
+    {
+      key: 'modifiedAfter',
+      label: '修改日期',
+      type: 'date',
+      defaultValue: '',
+      col: { span: 8 },
+      fieldProps: {
+        type: 'date',
+        valueFormat: 'YYYY-MM-DDTHH:mm:ss[Z]',
+        placeholder: '选择开始日期',
+        style: {
+          width: '100%',
+        },
+      },
+    },
+  ],
+  formConfig: {
+    showCollapseButton: true,
+    collapseRows: 1,
+  },
+}
+
+const requestProducts: TableProRequest<Product, ProductQuery> = async ({
+  page,
+  pageSize,
+  query,
+  signal,
+}) => {
+  const limit = pageSize ?? 10
+  const skip = ((page ?? 1) - 1) * limit
+  const params = new URLSearchParams({
+    limit: String(limit),
+    skip: String(skip),
+    select: 'id,title,category,brand,price,rating,stock,meta',
+  })
+
+  let url = PRODUCT_API
+
+  if (query.keyword.trim()) {
+    url = `${PRODUCT_API}/search`
+    params.set('q', query.keyword.trim())
+  }
+  else if (query.category) {
+    url = `${PRODUCT_API}/category/${query.category}`
+  }
+
+  if (query.modifiedAfter) {
+    params.set('modifiedAfter', query.modifiedAfter)
+  }
+
+  const response = await fetch(`${url}?${params}`, { signal })
+  if (!response.ok) throw new Error(`请求失败：${response.status}`)
+
+  const payload = await response.json() as ProductResponse
+
+  return {
+    data: payload.products,
+    total: payload.total,
+  }
+}
+</script>
+```
+
+  </template>
+</Demo>
+
+### 自定义筛选字段
+
+ElTablePro 会将 `filter-*`（* 代表 schema 中的 key）前缀的插槽转发给内部 ElFormPro。下面示例使用插槽自定义搜索项。
+
+<Demo>
+  <FilterSlotDemo />
+  <template #code>
+
+```vue
+<template>
+  <ElTablePro
+    ref="tableRef"
+    :columns="columns"
+    :request="requestOrders"
+    :filter="filter"
+    row-key="id"
+    :pagination="false"
+  >
+    <template #filter-customer="{ model }">
+      <ElSelect
+        v-model="model.customer"
+        placeholder="请选择客户"
+        clearable
+        style="width: 100%"
+      >
+        <ElOption label="全部客户" value="" />
+        <ElOption label="林晓" value="林晓" />
+        <ElOption label="陈默" value="陈默" />
+        <ElOption label="周宁" value="周宁" />
+        <ElOption label="许知远" value="许知远" />
+        <ElOption label="李夏" value="李夏" />
+      </ElSelect>
+    </template>
+
+    <template #filter-status="{ model }">
+      <ElSelect
+        v-model="model.status"
+        placeholder="请选择状态"
+        clearable
+        style="width: 100%"
+      >
+        <ElOption label="全部状态" value="" />
+        <ElOption label="正常" value="正常" />
+        <ElOption label="待确认" value="待确认" />
+        <ElOption label="已取消" value="已取消" />
+      </ElSelect>
+    </template>
+
+    <template #filter-buttons>
+      <ElButton @click="tableRef?.resetFilter()">重置</ElButton>
+      <ElButton type="primary" @click="tableRef?.search()">查询</ElButton>
+    </template>
+
+    <template #status="{ row }">
+      <ElTag :type="statusType(row.status)" effect="light">
+        {{ row.status }}
+      </ElTag>
+    </template>
+  </ElTablePro>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import {
+  ElButton,
+  ElOption,
+  ElSelect,
+  ElTag,
+} from 'element-plus'
+import {
+  ElTablePro,
+  type TableProColumn,
+  type TableProFilterConfig,
+  type TableProInstance,
+  type TableProRequest,
+} from 'element-plus-suite'
+
+interface Order {
+  id: number
+  number: string
+  customer: string
+  amount: number
+  status: '正常' | '待确认' | '已取消'
+}
+
+interface OrderFilter {
+  number: string
+  customer: string
+  status: string
+}
+
+const tableRef = ref<TableProInstance>()
+
+const columns: TableProColumn<Order>[] = [
+  { prop: 'number', label: '订单号', minWidth: 150 },
+  { prop: 'customer', label: '客户', minWidth: 140 },
+  {
+    prop: 'amount',
+    label: '金额',
+    width: 120,
+    align: 'right',
+    formatter: (_row, _column, value) => `¥${Number(value).toLocaleString()}`,
+  },
+  { prop: 'status', label: '状态', width: 110, slot: 'status' },
+]
+
+const dataSource: Order[] = [
+  { id: 1, number: 'SO-2026-001', customer: '林晓', amount: 1280, status: '正常' },
+  { id: 2, number: 'SO-2026-002', customer: '陈默', amount: 760, status: '待确认' },
+  { id: 3, number: 'SO-2026-003', customer: '周宁', amount: 2300, status: '正常' },
+  { id: 4, number: 'SO-2026-004', customer: '许知远', amount: 420, status: '已取消' },
+  { id: 5, number: 'SO-2026-005', customer: '李夏', amount: 1680, status: '待确认' },
+]
+
+const filter: TableProFilterConfig<OrderFilter> = {
+  schema: [
+    {
+      key: 'number',
+      label: '订单号',
+      type: 'input',
+      defaultValue: '',
+      fieldProps: { placeholder: '请输入订单号' },
+    },
+    {
+      key: 'customer',
+      label: '客户',
+      type: 'select',
+      defaultValue: '',
+    },
+    {
+      key: 'status',
+      label: '状态',
+      type: 'select',
+      defaultValue: '',
+    },
+  ],
+  formConfig: {
+    // 一行 1 / 2 / 3 / 4 列随屏幕变化
+    col: { span: 24, sm: 12, md: 8, xl: 6 },
+    collapseRows: 1,
+    showCollapseButton: true,
+  },
+}
+
+const requestOrders: TableProRequest<Order, OrderFilter> = async ({ query }) => {
+  const data = dataSource.filter((item) => {
+    const numberMatched = !query.number || item.number.includes(query.number)
+    const customerMatched = !query.customer || item.customer === query.customer
+    const statusMatched = !query.status || item.status === query.status
+
+    return numberMatched && customerMatched && statusMatched
+  })
+
+  return {
+    data,
+    total: data.length,
+  }
+}
+
+function statusType(status: Order['status']): 'success' | 'warning' | 'info' {
+  return status === '正常' ? 'success' : status === '待确认' ? 'warning' : 'info'
+}
+</script>
+```
+
+  </template>
+</Demo>
 
 ## 自定义列
 
@@ -646,39 +946,60 @@ ElTablePro 在 Element Plus 的 Table 上进行了一层封装，支持了一些
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| data | Table 的数据，ElTablePro 推荐使用 request 来加载 | Row[] | [] |
-| request | 远程表数据请求函数 | TableProRequest&lt;Row&gt; | undefined |
-| columns | 列配置 | TableProColumn&lt;Row&gt;[] | [] |
-| rowKey | 行唯一标识 | string \\| (row) =&gt; string \\| number | - |
-| pagination | 分页配置，`false` 时隐藏分页 | boolean \\| TableProPagination | true |
-| mergeFields | 按顺序逐级合并连续同值的字段 | string[] | [] |
+| data | Table 的数据，ElTablePro 推荐使用 request 来加载 | `Row[]` | [] |
+| request | 远程表数据请求函数 | `TableProRequest<Row, Query>`/ `undefined` |
+| query | 已应用的检索条件对象 | `Query` | &#123;&#125; |
+| filter | 筛选表单配置 | `TableProFilterConfig<Query>` | `undefined` |
+| columns | 列配置 | `TableProColumn<Row>[]` | [] |
+| rowKey | 行唯一标识 | `string` / `(row) => string` / `number` | - |
+| pagination | 分页配置，`false` 时隐藏分页 | `boolean` \\| `TableProPagination` | true |
+| mergeFields | 按顺序逐级合并连续同值的字段 | `string[]` | [] |
 
 更多属性请参考 [**Element Plus Table**](https://element-plus.org/zh-CN/component/table#table-%E5%B1%9E%E6%80%A7)。
+
+### TableProFilterConfig
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| schema | 筛选表单的字段配置 | `FormProSchemaItem[]` | - |
+| model | 筛选表单的当前值 | `Query` | &#123;&#125; |
+| defaultValue | 筛选表单的初始值 | `Query` | &#123;&#125; |
+| formConfig | 筛选表单的布局和折叠配置 | `TableProFilterConfigExtension` | - |
+
+TableProFilterConfigExtension 在 FormProConfig 基础上增加以下筛选配置：
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| showCollapseButton | 是否显示展开/收起按钮 | `boolean` | false |
+| collapseRows | 收起时显示的行数 | `number` | 1 |
+| collapseCount | 收起时显示的字段数量；优先级高于 collapseRows | `number` | - |
+| collapsed | 是否默认收起 | `boolean` | true |
 
 ### TableProColumn
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| prop | 字段名| string | - |
-| label | 列标题 | string | - |
-| visible | 是否显示列 | boolean | true |
-| slot | 自定义单元格插槽名 | string | - |
-| headerSlot | 自定义表头插槽名 | string | - |
-| render | 使用渲染函数生成单元格内容 | (scope) =&gt; VNodeChild | - |
-| headerRender | 使用渲染函数生成表头内容 | (scope) =&gt; VNodeChild | - |
-| autoMerge | 当前列是否合并连续同值 | boolean | false |
-| children | 分组表头的子列 | TableProColumn&lt;Row&gt;[] | - |
+| prop | 字段名| `string` | - |
+| label | 列标题 | `string` | - |
+| visible | 是否显示列 | `boolean` | true |
+| slot | 自定义单元格插槽名 | `string` | - |
+| headerSlot | 自定义表头插槽名 | `string` | - |
+| render | 使用渲染函数生成单元格内容 | `(scope) => VNodeChild` | - |
+| headerRender | 使用渲染函数生成表头内容 | `(scope) => VNodeChild` | - |
+| autoMerge | 当前列是否合并连续同值 | `boolean` | false |
+| children | 分组表头的子列 | `TableProColumn<Row>[]` | - |
 
 更多属性请参考 [**Element Plus Table-column API**](https://element-plus.org/zh-CN/component/table#table-column-api)。
 
 ### TableProRequest
 
-`TableProRequest<Row>` 是 `request` 属性的类型。组件会在初始化、分页变化或调用 `reload` 时执行它，并使用返回值更新表格与分页总数。
+组件会在初始化、分页变化或调用 `reload` 时执行它，并使用返回值更新表格与分页总数。
 
 ```ts
-type TableProRequest<Row> = (params: {
+type TableProRequest<Row, Query = Record<string, any>> = (params: {
   page: number | null
   pageSize: number | null
+  query: Query
   signal: AbortSignal
 }) => Promise<{
   data: Row[]
@@ -690,9 +1011,9 @@ type TableProRequest<Row> = (params: {
 
 | 参数名 | 说明 | 类型 |
 | --- | --- | --- |
-| page | 当前页码；关闭分页时为 `null` | number \| null |
-| pageSize | 每页条数；关闭分页时为 `null` | number \| null |
-| signal | 用于取消请求的信号，可直接传给 `fetch` 或 `axios` | AbortSignal |
+| page | 当前页码 | `number` / `null` |
+| pageSize | 每页条数 | `number` / `null` |
+| signal | 用于取消请求的信号 | `AbortSignal` |
 
 `signal` 由组件自动提供。请求函数不需要取消能力时，可以不解构这个参数。
 
@@ -700,18 +1021,19 @@ type TableProRequest<Row> = (params: {
 
 | 字段名 | 说明 | 类型 |
 | --- | --- | --- |
-| data | 表数据 | Row[] |
-| total | 数据总条数 | number |
+| data | 表数据 | `Row[]` |
+| total | 数据总条数 | `number` |
 
 ### TableProPagination
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| page | 当前页码 | number | 1 |
-| pageSize | 每页条数 | number | 20 |
-| pageSizes | 每页条数选项 | number[] | [10, 20, 50, 100] |
-| layout | 分页布局 | string | total, sizes, prev, pager, next, jumper |
-| background | 是否为页码添加背景色 | boolean | true |
+| page | 当前页码 | `number` | 1 |
+| pageSize | 每页条数 | `number` | 20 |
+| pageSizes | 每页条数选项 | `number[]` | [10, 20, 50, 100] |
+| pagerCount | 页码按钮数量 | `number` | 5 |
+| layout | 分页布局 | `string` | total, sizes, prev, pager, next, jumper |
+| background | 是否为页码添加背景色 | `boolean` | true |
 
 更多分页配置请参考 [**Element Plus Pagination**](https://element-plus.org/zh-CN/component/pagination.html)。
 
@@ -726,29 +1048,10 @@ type TableProRequest<Row> = (params: {
 
 ### Table Exposes
 
-| 方法名 | 说明 | 参数 | 返回值 |
-| --- | --- | --- | --- |
-| reload | 重新执行请求；不传参数时刷新当前页 | &#123; page?: number &#125; | Promise&lt;void&gt; |
+| 方法名 | 说明 | 类型 |
+| --- | --- | --- |
+| reload | 重新执行请求；不传参数时刷新当前页 | <ApiType type="Function" signature="(options?: &#123; page?: number &#125; &#124; undefined) =&gt; Promise&lt;void&gt;" /> |
+| search | 应用当前筛选条件并回到第一页 | <ApiType type="Function" signature="() =&gt; Promise&lt;void&gt;" /> |
+| resetFilter | 重置筛选条件并重新请求 | <ApiType type="Function" signature="() =&gt; Promise&lt;void&gt;" /> |
 
 更多方法请参考 [**Element Plus Table Exposes**](https://element-plus.org/zh-CN/component/table#table-exposes)。
-
-### 国际化
-
-Element Plus Suite 是基于 Element Plus 上的组件封装，因此会直接继承 `ElConfigProvider` 中设置的语言，不需要单独配置 `locale`。
-
-通常在您的项目 `App.vue` 或应用根节点配置一次即可
-
-```vue
-<script setup lang="ts">
-import { ElConfigProvider } from 'element-plus'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
-</script>
-
-<template>
-  <ElConfigProvider :locale="zhCn">
-    <App />
-  </ElConfigProvider>
-</template>
-```
-
-更多配置请参考 [**Element Plus 国际化**](https://element-plus.org/zh-CN/guide/i18n)。

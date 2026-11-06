@@ -6,6 +6,7 @@ import {
   onMounted,
   shallowRef,
   useSlots,
+  reactive,
   watch,
   withDirectives,
   type PropType,
@@ -16,6 +17,8 @@ import {
   vLoading,
 
 } from 'element-plus'
+import { ElFormPro } from '../form-pro'
+import { getSchemaDefaults } from '../form-pro/utils'
 import { renderTableColumns } from './render-columns'
 import { useTableMerge } from './composables/use-table-merge'
 import { useTablePagination } from './composables/use-table-pagination'
@@ -23,6 +26,7 @@ import { useTableRequest } from './composables/use-table-request'
 import type {
   TableProColumn,
   TableProInstance,
+  TableProFilterConfig,
   TableProPagination,
   TableProRequest,
   TableProRequestResult,
@@ -50,6 +54,14 @@ export default defineComponent({
       type: Array as PropType<string[]>,
       default: () => [],
     },
+    query: {
+      type: Object as PropType<Record<string, any>>,
+      default: undefined,
+    },
+    filter: {
+      type: Object as PropType<TableProFilterConfig>,
+      default: undefined,
+    },
     data: {
       type: Array as PropType<any[]>,
       default: () => [],
@@ -70,8 +82,49 @@ export default defineComponent({
     const tableRef = shallowRef<TableProTableInstance | null>(null)
     const remoteData = shallowRef<any[]>([])
     const remoteTotal = shallowRef(0)
+    const filterDefaults = computed(() => ({
+      ...getSchemaDefaults(props.filter?.schema ?? []),
+      ...(props.filter?.defaultValue ?? {}),
+      ...(props.filter?.model ?? {}),
+    }))
+    const filterModel = reactive<Record<string, any>>({ ...filterDefaults.value })
+    const appliedQuery = shallowRef<Record<string, any>>({
+      ...filterDefaults.value,
+      ...(props.query ?? {}),
+    })
+
+    watch(
+      () => props.query,
+      (query) => {
+        appliedQuery.value = {
+          ...filterDefaults.value,
+          ...(query ?? {}),
+        }
+        if (props.request) {
+          void load()
+        }
+      },
+      { deep: true },
+    )
+
+    watch(
+      () => props.filter?.model,
+      (value) => {
+        for (const key of Object.keys(filterModel)) delete filterModel[key]
+        Object.assign(filterModel, filterDefaults.value, value ?? {})
+      },
+      { deep: true },
+    )
 
     const pagination = useTablePagination(() => props.pagination)
+    let skipNextPaginationRequest = false
+
+    /** 修改页码；如果分页 watcher 会触发请求，则让下一次 watcher 跳过重复请求。 */
+    function setPage(page: number) {
+      if (page === pagination.currentPage.value) return
+      if (pagination.enabled.value) skipNextPaginationRequest = true
+      pagination.currentPage.value = page
+    }
 
     const rowKeyValue = computed(() => {
       const key = props.rowKey
@@ -85,6 +138,7 @@ export default defineComponent({
       request: () => props.request,
       page: () => pagination.requestPage.value,
       pageSize: () => pagination.requestPageSize.value,
+      query: () => appliedQuery.value,
       onData: (result) => {
         remoteData.value = result.data
         remoteTotal.value = result.total
@@ -128,8 +182,25 @@ export default defineComponent({
 
     async function reload(options?: { page?: number }) {
       if (options?.page !== undefined) {
-        pagination.currentPage.value = options.page
+        setPage(options.page)
       }
+      await load()
+    }
+
+    async function search() {
+      appliedQuery.value = { ...filterModel }
+      setPage(1)
+      await load()
+    }
+
+    async function resetFilter() {
+      const defaults = { ...filterDefaults.value }
+      for (const key of Object.keys(filterModel)) {
+        delete filterModel[key]
+      }
+      Object.assign(filterModel, defaults)
+      appliedQuery.value = { ...defaults }
+      setPage(1)
       await load()
     }
 
@@ -154,6 +225,10 @@ export default defineComponent({
         pagination.requestPageSize.value,
       ] as const,
       () => {
+        if (skipNextPaginationRequest) {
+          skipNextPaginationRequest = false
+          return
+        }
         if (props.request) {
           void reload()
         }
@@ -165,6 +240,8 @@ export default defineComponent({
       {
         get(_target, key) {
           if (key === 'reload') return reload
+          if (key === 'search') return search
+          if (key === 'resetFilter') return resetFilter
 
           const table = tableRef.value
           if (!table) return undefined
@@ -176,7 +253,7 @@ export default defineComponent({
             : value
         },
         has(_target, key) {
-          if (key === 'reload') return true
+          if (key === 'reload' || key === 'search' || key === 'resetFilter') return true
           return tableRef.value != null && key in tableRef.value
         },
       },
@@ -190,7 +267,37 @@ export default defineComponent({
       }
     })
 
+    const getFilterSlots = () => {
+      return Object.fromEntries(
+        Object.entries(slots)
+          .filter(([name]) => name.startsWith('filter-'))
+          .map(([name, slot]) => [name.slice(7), slot]),
+      )
+    }
+
     return () => {
+      const filterVNode = props.filter
+        ? h(ElFormPro, {
+            schema: props.filter.schema,
+            modelValue: filterModel,
+            collapsible: true,
+            searchMode: true,
+            formConfig: {
+              // 筛选表单开启折叠按钮时，默认按一行折叠。
+              ...(props.filter.formConfig?.showCollapseButton
+                ? { collapseRows: 1 }
+                : {}),
+              ...(props.filter.formConfig ?? {}),
+            },
+            'onUpdate:modelValue': (value: Record<string, any>) => {
+              for (const key of Object.keys(filterModel)) delete filterModel[key]
+              Object.assign(filterModel, value)
+            },
+            onSubmit: () => void search(),
+            onReset: () => void resetFilter(),
+          }, getFilterSlots())
+        : null
+
       const tableVNode = h(
         ElTable,
         {
@@ -211,6 +318,7 @@ export default defineComponent({
         'div',
         { class: 'el-table-pro' },
         [
+          filterVNode,
           withDirectives(tableVNode, [
             [vLoading, isLoading.value],
           ]),
@@ -222,6 +330,7 @@ export default defineComponent({
               pageSizes: [
                 ...(pagination.config.value?.pageSizes ?? []),
               ],
+              pagerCount: pagination.config.value?.pagerCount,
               layout: pagination.config.value?.layout,
               background: pagination.config.value?.background,
               'onUpdate:currentPage': (page: number) => {

@@ -127,3 +127,88 @@ const requestUsers: TableProRequest<User> = async ({
 ## License
 
 MIT
+## ElFormPro
+
+`ElFormPro` 是基于 schema 的 Element Plus 表单组件：
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { ElFormPro, type FormProSchemaItem } from 'element-plus-suite'
+
+const formData = ref({
+  keyword: '',
+  status: '',
+})
+
+const schema: FormProSchemaItem[] = [
+  { key: 'keyword', label: '关键词', type: 'input', col: { span: 8 } },
+  {
+    key: 'status',
+    label: '状态',
+    type: 'select',
+    col: { span: 8 },
+    fieldProps: {
+      options: [
+        { name: '启用', id: 'active' },
+        { name: '停用', id: 'disabled' },
+      ],
+      props: {
+        label: 'name',
+        value: 'id',
+      },
+    },
+  },
+]
+</script>
+
+<template>
+  <ElFormPro v-model="formData" :schema="schema" />
+</template>
+```
+
+## 高级筛选
+
+`ElTablePro` 可以通过 `filter` 组合 `ElFormPro`：
+
+```vue
+<ElTablePro
+  :columns="columns"
+  :request="requestUsers"
+  :filter="{
+    schema: filterSchema,
+    model: filters,
+    formConfig: {
+      showCollapseButton: true,
+      collapseRows: 1,
+    },
+  }"
+  row-key="id"
+/>
+```
+
+筛选草稿与已应用条件分离。点击查询后才应用条件并回到第一页；切换分页时继续使用已应用条件。
+
+`request` 会收到统一参数：
+
+```ts
+const requestUsers: TableProRequest<User, UserQuery> = async ({
+  page,
+  pageSize,
+  query,
+  signal,
+}) => {
+  const params = new URLSearchParams({
+    page: String(page ?? 1),
+    pageSize: String(pageSize ?? 20),
+    keyword: query.keyword,
+  })
+  const response = await fetch(`/api/users?${params}`, { signal })
+  const payload = await response.json()
+
+  return {
+    data: payload.list,
+    total: payload.total,
+  }
+}
+```

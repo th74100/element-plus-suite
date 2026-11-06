@@ -1,10 +1,15 @@
 /*
- * TablePro 的根节点负责表格与分页器的整体布局。
- * 使用 flex + gap 统一间距，避免每一处使用方重复设置 margin。
+ * TablePro 只负责内容间距，不改变根节点的文档流布局。
  */
 .el-table-pro {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   min-width: 0;
+}
+
+.el-table-pro .el-pagination {
+  margin-top: 16px;
+}
+
+/* 左侧留出可用空间，让分页信息与页码操作分列。 */
+.el-table-pro .el-pagination .btn-prev {
+  margin-left: auto;
 }

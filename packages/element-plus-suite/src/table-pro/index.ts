@@ -4,6 +4,8 @@ export type {
   TableProColumnContext,
   TableProColumnHeaderRenderScope,
   TableProColumnRenderScope,
+  TableProFilterConfigExtension,
+  TableProFilterConfig,
   TableProInstance,
   TableProOwnInstance,
   TableProOwnProps,

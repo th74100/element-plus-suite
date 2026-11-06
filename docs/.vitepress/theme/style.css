@@ -164,6 +164,46 @@ html:root {
   margin: 0;
 }
 
+/*
+ * The VitePress document list/link rules also match Element Plus Upload's
+ * internal list. Restore the component's own list and link styles.
+ */
+.vp-doc .el-upload-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vp-doc .el-upload-list:empty {
+  display: none;
+}
+
+.vp-doc .el-upload-list li {
+  margin: 0;
+}
+
+.vp-doc .el-upload-list a {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+/*
+ * 宽屏模式：放宽正文区域，避免组件文档和 Demo 被限制在较窄的阅读宽度。
+ * 仅调整文档内容区，不改变导航栏、侧边栏和首页布局。
+ */
+.VPDoc .content-container {
+  max-width: 1080px !important;
+}
+
+.VPDoc:not(.has-sidebar) .content {
+  max-width: 1080px !important;
+}
+
+.VPDoc:not(.has-sidebar) .container {
+  max-width: 1200px !important;
+}
+
 @media (max-width: 760px) {
   .vp-demo__preview { padding: 16px; }
   .demo-toolbar { flex-wrap: wrap; }
@@ -248,7 +288,7 @@ html:root {
   padding: 0 6px;
   border-radius: 5px;
   background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-1);
+  color: var(--vp-c-brand-1);
   font-size: 12px;
 }
 .vp-doc .api-type__name {
@@ -282,30 +322,24 @@ html:root {
   outline: none;
 }
 .api-type-popover {
-  max-width: calc(100vw - 32px);
+  width: max-content !important;
+  max-width: min(490px, calc(100vw - 32px)) !important;
 }
-.vp-doc .api-type__signature {
-  max-width: min(720px, calc(100vw - 64px));
+.api-type-popover .api-type__signature {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
-  overflow-x: auto;
-  color: var(--vp-c-text-1);
+  padding: 2px 10px;
+  border-radius: 4px;
+  background: #f5f7fa;
+  color: #0c61c9;
   font-size: 12px;
   line-height: 1.6;
-}
-.vp-doc .api-type__signature .shiki {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  font-size: 12px;
-}
-/* 弹层会被 teleport 到 body，需要单独清除 shiki 默认的上下外边距。 */
-.api-type-popover .api-type__signature .shiki {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-.vp-doc .api-type__signature .shiki code {
-  background: transparent;
-  font-size: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 /*
  * VitePress 在 1440px 以上会用 100vw 计算侧边栏和导航边界。

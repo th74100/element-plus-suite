@@ -6,7 +6,6 @@
       <ElPopover
         placement="top"
         trigger="click"
-        width="max-content"
         popper-class="api-type-popover"
       >
         <template #reference>
@@ -19,12 +18,7 @@
           </button>
         </template>
 
-        <div
-          v-if="highlightedSignature"
-          class="api-type__signature"
-          v-html="highlightedSignature"
-        />
-        <code v-else class="api-type__signature">{{ signature }}</code>
+        <code class="api-type__signature">{{ signature }}</code>
       </ElPopover>
 
       <template #fallback>
@@ -41,20 +35,9 @@
 
 <script setup lang="ts">
 import { ElPopover } from 'element-plus'
-import { onMounted, ref, watch } from 'vue'
-import { highlightApiType } from '../composables/use-api-type-highlight'
 
-const props = defineProps<{
+defineProps<{
   type: string
   signature: string
 }>()
-
-const highlightedSignature = ref('')
-
-async function updateHighlight() {
-  highlightedSignature.value = await highlightApiType(props.signature)
-}
-
-watch(() => props.signature, updateHighlight)
-onMounted(updateHighlight)
 </script>

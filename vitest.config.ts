@@ -17,6 +17,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     include: [
       'packages/**/__tests__/table-pro.*.spec.ts',
+      'packages/**/__tests__/form-pro.*.spec.ts',
       'packages/**/__tests__/table-pro.*.spec.tsx',
       'tests/**/*.spec.ts',
       'tests/**/*.spec.tsx',

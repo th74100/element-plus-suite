@@ -8,6 +8,7 @@ interface UseTableRequestOptions<Row> {
   request: () => TableProRequest<Row> | undefined
   page: () => number | null
   pageSize: () => number | null
+  query: () => Record<string, any>
   onLoaded?: (result: TableProRequestResult<Row>) => void
   onError?: (error: unknown) => void
   onData?: (result: TableProRequestResult<Row>) => void
@@ -41,6 +42,7 @@ export function useTableRequest<Row>(
       const result = await request({
         page: options.page(),
         pageSize: options.pageSize(),
+        query: options.query(),
         signal: currentController.signal,
       })
 

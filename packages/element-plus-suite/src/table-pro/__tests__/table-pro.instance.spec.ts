@@ -42,6 +42,7 @@ describe('TablePro instance API', () => {
     await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(1))
     await getInstance(wrapper).reload({ page: 3 })
 
+    expect(request).toHaveBeenCalledTimes(2)
     expect(request.mock.calls.at(-1)?.[0]).toMatchObject({
       page: 3,
       pageSize: 20,

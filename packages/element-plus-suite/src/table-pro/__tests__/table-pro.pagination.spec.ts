@@ -26,6 +26,7 @@ describe('TablePro pagination config', () => {
       page: 1,
       pageSize: 50,
       pageSizes: [10, 20, 50, 100],
+      pagerCount: 5,
     })
   })
 })
