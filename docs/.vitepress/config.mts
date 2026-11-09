@@ -68,12 +68,23 @@ export default defineConfig({
       ],
       '/components/': [
         {
+          text: '基础组件',
+          items: [
+            { text: 'Button 按钮', link: '/components/button-pro/' },
+          ],
+        },
+        {
           text: '数据展示',
           items: [
             { text: 'Table 表格', link: '/components/table-pro/' },
+          ],
+        },
+        {
+          text: '数据录入',
+          items: [
             { text: 'Form 表单', link: '/components/form-pro/' },
           ],
-        }
+        },
       ],
     },
     socialLinks: [

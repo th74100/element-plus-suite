@@ -4,6 +4,7 @@
 
 ## 组件
 
+- `ElButtonPro`：在 Element Plus Button 基础上扩展了按钮的能力。
 - `ElTablePro`：在 Element Plus Table 基础上封装分页、远程请求、筛选、单元格合并等常用能力，减少表格页面的样板代码。
 - `ElFormPro`：基于 schema 配置生成表单，内置栅格布局、组合字段、校验、按钮和自定义插槽能力，适合快速搭建查询表单和业务表单。
 
@@ -32,7 +33,7 @@ app.mount('#app')
 按需导入：
 
 ```ts
-import { ElFormPro, ElTablePro } from 'element-plus-suite'
+import { ElButtonPro, ElFormPro, ElTablePro } from 'element-plus-suite'
 import 'element-plus-suite/dist/index.css'
 ```
 

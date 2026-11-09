@@ -30,6 +30,7 @@ npm install element-plus-suite
 ```ts
 import { createApp } from 'vue'
 import ElementPlusSuite from 'element-plus-suite'
+import 'element-plus-suite/dist/index.css'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -58,90 +59,28 @@ app.mount('#app')
 也可以按需导入：
 
 ```ts
-import { ElFormPro, ElTablePro } from 'element-plus-suite'
+import { ElButtonPro, ElTablePro } from 'element-plus-suite'
 ```
 
-## 快速开始
+## ElButtonPro
+
+`ElButtonPro` 在 Element Plus Button 基础上增加整行按钮、渐变背景和鼠标经过渐变能力：
 
 ```vue
-<script setup lang="ts">
-import { ElTablePro, type TableProColumn } from 'element-plus-suite'
-
-interface User {
-  id: number
-  name: string
-  email: string
-}
-
-const columns: TableProColumn<User>[] = [
-  { prop: 'name', label: '姓名', minWidth: 140 },
-  { prop: 'email', label: '邮箱', minWidth: 220 },
-]
-
-const dataSource: User[] = [
-  { id: 1, name: '林晓', email: 'linxiao@example.com' },
-  { id: 2, name: '陈默', email: 'chenmo@example.com' },
-]
-</script>
-
 <template>
-  <ElTablePro
-    :columns="columns"
-    :data="dataSource"
-    row-key="id"
-    :pagination="false"
-  />
+  <ElButtonPro type="primary" block>提交</ElButtonPro>
+
+  <ElButtonPro
+    type="primary"
+    gradient="linear-gradient(135deg, #6253e1, #04befe)"
+    hover-gradient="linear-gradient(135deg, #06b6d4, #7c3aed)"
+  >
+    渐变按钮
+  </ElButtonPro>
 </template>
 ```
 
-更多用法请查看[文档](https://th74100.github.io/element-plus-suite/components/table-pro/)
-
-## ElFormPro
-
-`ElFormPro` 是基于 schema 的 Element Plus 表单组件：
-
-```vue
-<script setup lang="ts">
-import { ElFormPro, type FormProSchemaItem } from 'element-plus-suite'
-
-const schema: FormProSchemaItem[] = [
-  {
-    key: 'keyword',
-    label: '关键词',
-    defaultValue: '',
-    col: { span: 8 },
-  },
-  {
-    key: 'status',
-    label: '状态',
-    type: 'select',
-    defaultValue: 'active',
-    col: { span: 8 },
-    fieldProps: {
-      options: [
-        { name: '启用', id: 'active' },
-        { name: '停用', id: 'disabled' },
-      ],
-      props: {
-        label: 'name',
-        value: 'id',
-      },
-    },
-  },
-]
-</script>
-
-<template>
-  <ElFormPro
-    :schema="schema"
-    :form-config="{
-      labelWidth: 120,
-    }"
-  />
-</template>
-```
-
-更多用法请查看[文档](https://th74100.github.io/element-plus-suite/components/form-pro/)
+更多用法请查看[文档](https://th74100.github.io/element-plus-suite/components/button-pro/)
 
 ## License
 

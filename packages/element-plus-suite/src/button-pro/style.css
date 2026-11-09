@@ -1,0 +1,83 @@
+/* Block layout */
+
+.el-button-pro.is-block {
+  display: flex;
+  width: 100%;
+  margin-left: 0;
+}
+
+.el-button-pro.is-block:not(:last-child) {
+  margin-bottom: 12px;
+}
+
+/* Icon spacing */
+.el-button-pro:has(> .el-icon) > span {
+  margin-left: 0;
+}
+
+.el-button-pro:has(> .el-icon) {
+  gap: 6px;
+}
+
+.el-button-pro.el-button--small:has(> .el-icon) {
+  gap: 4px;
+}
+
+.el-button-pro.el-button--large:has(> .el-icon) {
+  gap: 8px;
+}
+
+.el-button-pro.has-icon-end:has(> .el-icon) > .el-icon {
+  order: 1;
+}
+
+.el-button-pro.has-icon-end:has(> .el-icon) > span {
+  order: 0;
+}
+
+/* Gradient */
+.el-button-pro.is-gradient {
+  position: relative;
+  isolation: isolate;
+  border: 0;
+}
+
+.el-button-pro.is-gradient.has-hover-gradient {
+  background-image: var(--el-button-pro-hover-gradient);
+}
+
+.el-button-pro.is-gradient::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--el-button-pro-gradient);
+  opacity: 1;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+
+.el-button-pro.is-gradient > span,
+.el-button-pro.is-gradient > .el-icon {
+  position: relative;
+  z-index: 1;
+}
+
+/* Gradient states */
+.el-button-pro.is-gradient.has-hover-gradient:not(.is-loading):not(.is-disabled):hover::after,
+.el-button-pro.is-gradient.has-hover-gradient:not(.is-loading):not(.is-disabled):active::after {
+  opacity: 0;
+}
+
+.el-button-pro.is-gradient.is-disabled {
+  background-image: none;
+}
+
+.el-button-pro.is-gradient.is-disabled::after {
+  display: none;
+}
+
+.el-button-pro.is-gradient.is-loading::before {
+  z-index: 2;
+}
