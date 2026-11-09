@@ -1,6 +1,6 @@
 # Element Plus Suite
 
-Element Plus Suite 是基于 Element Plus 二次封装的组件库，开箱即用。可以显著地提升制作 CRUD 页面的效率，轻松搬砖。
+Element Plus Suite 是基于 Element Plus 二次封装的组件库，开箱即用。可以显著地提升中台页面的效率，轻松搬砖。
 
 [文档](https://th74100.github.io/element-plus-suite/) · [GitHub](https://github.com/th74100/element-plus-suite)
 
@@ -39,45 +39,11 @@ app.use(ElementPlusSuite)
 app.mount('#app')
 ```
 
-如果需要一起注册 Element Plus：
-
-```ts
-import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import ElementPlusSuite from 'element-plus-suite'
-import 'element-plus-suite/dist/index.css'
-import App from './App.vue'
-
-const app = createApp(App)
-
-app.use(ElementPlus)
-app.use(ElementPlusSuite)
-app.mount('#app')
-```
-
 也可以按需导入：
 
 ```ts
-import { ElButtonPro, ElTablePro } from 'element-plus-suite'
-```
-
-## ElButtonPro
-
-`ElButtonPro` 在 Element Plus Button 基础上增加整行按钮、渐变背景和鼠标经过渐变能力：
-
-```vue
-<template>
-  <ElButtonPro type="primary" block>提交</ElButtonPro>
-
-  <ElButtonPro
-    type="primary"
-    gradient="linear-gradient(135deg, #6253e1, #04befe)"
-    hover-gradient="linear-gradient(135deg, #06b6d4, #7c3aed)"
-  >
-    渐变按钮
-  </ElButtonPro>
-</template>
+import { ElButtonPro, ElTablePro, ElFormPro } from 'element-plus-suite'
+import 'element-plus-suite/dist/index.css'
 ```
 
 更多用法请查看[文档](https://th74100.github.io/element-plus-suite/components/button-pro/)

@@ -1,6 +1,6 @@
 ---
 title: Button 按钮 | Element Plus Suite
-description: 在 Element Plus Button 基础上增加整行按钮和渐变背景能力。
+description: 在 Element Plus Button 基础上进行的一些功能扩展。
 ---
 
 <script setup lang="ts">
@@ -13,7 +13,7 @@ import IconPlacementDemo from './demos/icon-placement.vue'
 
 # Button 按钮
 
-`ElButtonPro` 基于 Element Plus `ElButton`，保留全部属性、事件、插槽和实例能力，并额外支持 `block`、`iconPlacement`、`gradient` 和 `hoverGradient`。
+`ElButtonPro` 基于 Element Plus Button，在保留其全部属性、事件和插槽能力的基础上提供额外扩展。
 
 ## 基础用法
 
@@ -25,10 +25,11 @@ import IconPlacementDemo from './demos/icon-placement.vue'
 
 ```vue
 <template>
-  <ElButtonPro type="primary">主要按钮</ElButtonPro>
-  <ElButtonPro type="success">成功按钮</ElButtonPro>
-  <ElButtonPro type="warning" plain>朴素按钮</ElButtonPro>
-  <ElButtonPro type="danger" round>圆角按钮</ElButtonPro>
+    <ElButtonPro>Default</ElButtonPro>
+    <ElButtonPro type="primary">Primary</ElButtonPro>
+    <ElButtonPro type="success">Success</ElButtonPro>
+    <ElButtonPro type="warning" plain>Warning</ElButtonPro>
+    <ElButtonPro type="danger" round>Danger</ElButtonPro>
 </template>
 ```
 
@@ -61,19 +62,32 @@ import IconPlacementDemo from './demos/icon-placement.vue'
   <template #code>
 
 ```vue
+<script setup lang="ts">
+import { Search } from '@element-plus/icons-vue'
+</script>
+
 <template>
   <ElButtonPro
     type="primary"
     :gradient="{ from: '#6253e1', to: '#04befe'}"
+    :icon="Search"
+    circle
+  />
+
+  <ElButtonPro
+    type="primary"
+    :gradient="{ from: '#6253e1', to: '#04befe'}"
     :hover-gradient="{ from: '#06b6d4', to: '#7c3aed'}"
+    :icon="Search"
   >
-    Gradient Button
+    Button
   </ElButtonPro>
 
   <ElButtonPro plain>
     Button
   </ElButtonPro>
 </template>
+
 
 ```
   </template>
@@ -166,7 +180,7 @@ const iconPlacement = ref<ButtonProIconPlacement>('start')
 
 ## 异步加载
 
-点击处理函数返回 Promise 时，`ElButtonPro` 会自动显示加载状态，并在 Promise 完成后恢复。
+`ElButtonPro` 会在点击处理函数执行期间自动显示加载状态，并在处理完成后恢复。
 
 <Demo>
   <AsyncDemo />
@@ -198,18 +212,20 @@ function request() {
   </template>
 </Demo>
 
-## 属性
+## API
 
-### ElButtonPro
+`ElButtonPro` 是在 Element Plus Button 基础上进行了一些功能扩展，这里只列出与 Element Plus Button 不同 API。
+
+### Props
 
 | 属性 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | block | 按钮是否独占一行 | `boolean` | `false` |
-| iconPlacement | 图标在文字前或文字后 | `'start' \| 'end'` | `'start'` |
-| gradient | 渐变背景，支持 CSS 渐变字符串或起止颜色对象 | `string \| ButtonProGradient` | - |
-| hoverGradient | 鼠标经过时的渐变背景；渐变覆盖层会淡出并显示该背景 | `string \| ButtonProGradient` | - |
+| iconPlacement | 图标在文字前或文字后 | <ApiType type="string" signature="'start' &#124; 'end'" /> | `'start'` |
+| gradient | 渐变背景，支持 CSS 渐变字符串或起止颜色对象 | `string` / `ButtonProGradient` | - |
+| hoverGradient | 鼠标经过时的渐变背景；渐变覆盖层会淡出并显示该背景 | `string` / `ButtonProGradient` | - |
 
-其余属性与 [Element Plus Button](https://element-plus.org/zh-CN/component/button.html#button-attributes) 完全一致。
+更多属性请查看 [Element Plus Button](https://element-plus.org/zh-CN/component/button.html#button-attributes)
 
 ### ButtonProGradient
 
@@ -218,6 +234,12 @@ function request() {
 | from | 渐变起始颜色 | `string` | - |
 | to | 渐变结束颜色 | `string` | - |
 | angle | 渐变角度，单位为 `deg` | `number` | `135` |
+
+## 事件
+
+| 事件名 | 说明 | 回调参数 |
+| --- | --- | --- |
+| click | 点击事件，支持返回 Promise | `(event: MouseEvent) => void \| Promise<void>` |
 
 ### 特性
 - 整行按钮

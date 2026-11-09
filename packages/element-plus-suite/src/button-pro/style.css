@@ -65,17 +65,14 @@
 }
 
 /* Gradient states */
-.el-button-pro.is-gradient.has-hover-gradient:not(.is-loading):not(.is-disabled):hover::after,
-.el-button-pro.is-gradient.has-hover-gradient:not(.is-loading):not(.is-disabled):active::after {
+.el-button-pro.is-gradient:not(.is-loading):not(.is-disabled):hover::after,
+.el-button-pro.is-gradient:not(.is-loading):not(.is-disabled):active::after {
   opacity: 0;
 }
 
 .el-button-pro.is-gradient.is-disabled {
   background-image: none;
-}
-
-.el-button-pro.is-gradient.is-disabled::after {
-  display: none;
+  opacity: 0.6;
 }
 
 .el-button-pro.is-gradient.is-loading::before {

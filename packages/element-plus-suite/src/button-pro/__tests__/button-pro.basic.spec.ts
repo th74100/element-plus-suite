@@ -231,6 +231,55 @@ describe('ElButtonPro', () => {
     expect(wrapper.get('button').classes()).not.toContain('is-loading')
   })
 
+  it('只有 gradient 时也添加 is-gradient，便于悬停露出主题色', () => {
+    const wrapper = mount(ElButtonPro, {
+      props: {
+        type: 'primary',
+        gradient: 'linear-gradient(90deg, #6253e1, #04befe)',
+      },
+    })
+
+    const button = wrapper.get('button')
+    expect(button.classes()).toContain('is-gradient')
+    expect(button.classes()).not.toContain('has-hover-gradient')
+  })
+
+  it('没有 hover-gradient 时仍保持渐变变量', () => {
+    const gradient = 'linear-gradient(90deg, #6253e1, #04befe)'
+    const wrapper = mount(ElButtonPro, {
+      props: {
+        type: 'primary',
+        gradient,
+      },
+    })
+
+    const button = wrapper.get('button')
+    expect(button.attributes('style')).toContain(
+      `--el-button-pro-gradient: ${gradient}`,
+    )
+    expect(button.attributes('style')).not.toContain(
+      '--el-button-pro-hover-gradient',
+    )
+  })
+
+  it('disabled 时仍保留渐变 class 和 CSS 变量', () => {
+    const gradient = 'linear-gradient(90deg, #6253e1, #04befe)'
+    const wrapper = mount(ElButtonPro, {
+      props: {
+        type: 'primary',
+        disabled: true,
+        gradient,
+      },
+    })
+
+    const button = wrapper.get('button')
+    expect(button.classes()).toContain('is-disabled')
+    expect(button.classes()).toContain('is-gradient')
+    expect(button.attributes('style')).toContain(
+      `--el-button-pro-gradient: ${gradient}`,
+    )
+  })
+
   it('透传自定义 class 和 style', () => {
     const wrapper = mount(ElButtonPro, {
       attrs: {

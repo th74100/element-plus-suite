@@ -1,4 +1,5 @@
 <template>
+    <ElButtonPro>Default</ElButtonPro>
     <ElButtonPro type="primary">Primary</ElButtonPro>
     <ElButtonPro type="success">Success</ElButtonPro>
     <ElButtonPro type="warning" plain>Warning</ElButtonPro>

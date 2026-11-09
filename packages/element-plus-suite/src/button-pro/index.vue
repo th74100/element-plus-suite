@@ -95,18 +95,14 @@ export default defineComponent({
     })
 
     async function handleClick(event: MouseEvent) {
-      const onClick = attrs.onClick
-      if (typeof onClick !== 'function')
-        return
 
-      const result = onClick(event)
-      if (!result || typeof result.then !== 'function') return
+      const onClick = attrs?.onClick
+      if (typeof onClick !== 'function') return
 
-      loading.value = true
       try {
-        await result
-      }
-      finally {
+        loading.value = true
+        await onClick(event)
+      } finally {
         loading.value = false
       }
     }
