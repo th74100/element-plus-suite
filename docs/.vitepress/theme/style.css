@@ -347,17 +347,17 @@ html:root {
  * 改用 100% 的页面可用宽度，让头部和侧边栏始终共用同一条边界。
  */
 @media (min-width: 1440px) {
-  .VPNavBar.has-sidebar .title,
+  .VPNavBar.has-sidebar > .wrapper > .container > .title,
   .VPSidebar {
     width: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px);
   }
 
-  .VPNavBar.has-sidebar .content {
+  .VPNavBar.has-sidebar > .wrapper > .container > .content {
     padding-right: calc((100% - var(--vp-layout-max-width)) / 2 + 32px);
     padding-left: calc((100% - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
   }
 
-  .VPNavBar.has-sidebar .divider {
+  .VPNavBar.has-sidebar > .divider {
     padding-left: calc((100% - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
   }
 }
