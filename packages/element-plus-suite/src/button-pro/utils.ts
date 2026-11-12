@@ -1,4 +1,4 @@
-import type { ButtonProGradientValue } from './types'
+import type { ButtonProGradientValue } from './types/index'
 
 export function normalizeGradient(
   gradient: ButtonProGradientValue,

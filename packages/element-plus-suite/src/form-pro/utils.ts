@@ -1,4 +1,4 @@
-import type { FormProSchemaItem, FormProValue } from './types'
+import type { FormProSchemaItem, FormProValue } from './types/index'
 
 /** 根据 schema 生成表单初始值。 */
 export function getSchemaDefaults(

@@ -3,7 +3,7 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import { ElPagination } from 'element-plus'
 import { ElTablePro } from '../../index'
-import type { TableProRequest } from '../types'
+import type { TableProRequest } from '../types/index'
 
 const columns = [{ prop: 'name', label: '姓名' }]
 

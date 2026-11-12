@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { ElTablePro } from '../../index'
-import type { TableProColumn } from '../types'
+import type { TableProColumn } from '../types/index'
 import {
   calculateRowSpans,
   resolveMergeFields,

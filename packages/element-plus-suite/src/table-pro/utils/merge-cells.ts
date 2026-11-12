@@ -1,4 +1,4 @@
-import type { TableProColumn } from '../types'
+import type { TableProColumn } from '../types/index'
 
 export interface TableProMergeField<Row> {
   key: string

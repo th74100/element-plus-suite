@@ -1,5 +1,5 @@
 import type { Ref, VNode, VNodeChild } from 'vue'
-import type { FormProConfig, FormProSchemaItem } from '../form-pro/types'
+import type { FormProConfig, FormProSchemaItem } from '../../form-pro/types/index'
 
 /**
  * 表格列在运行时由 Element Plus 提供。

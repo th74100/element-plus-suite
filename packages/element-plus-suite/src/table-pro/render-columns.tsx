@@ -1,7 +1,7 @@
 import type { Slots, VNode } from 'vue'
 import { h } from 'vue'
 import { ElTableColumn } from 'element-plus'
-import type { TableProColumn } from './types'
+import type { TableProColumn } from './types/index'
 
 /**
  * 把列配置转换成 ElTableColumn 节点。

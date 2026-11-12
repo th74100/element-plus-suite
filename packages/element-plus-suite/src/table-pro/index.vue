@@ -41,7 +41,7 @@ import type {
   TableProTableInstance,
   TableProTableProps,
   TableProToolbarOptions,
-} from './types'
+} from './types/index'
 
 const TABLE_PRO_ICONS = {
   refresh: {

@@ -6,4 +6,4 @@ export type {
   ButtonProInstance,
   ButtonProOwnProps,
   ButtonProProps,
-} from './types'
+} from './types/index'

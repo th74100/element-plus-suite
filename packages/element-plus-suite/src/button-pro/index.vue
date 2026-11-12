@@ -18,7 +18,7 @@ import type {
   ButtonProGradientValue,
   ButtonProIconPlacement,
   ButtonProProps,
-} from './types'
+} from './types/index'
 
 export default defineComponent({
   name: 'ElButtonPro',

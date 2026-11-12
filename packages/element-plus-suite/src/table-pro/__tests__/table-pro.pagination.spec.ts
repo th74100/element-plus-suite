@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   normalizePagination,
   TABLE_PRO_DEFAULT_PAGINATION,
-} from '../types'
+} from '../types/index'
 
 describe('TablePro pagination config', () => {
   it('省略分页时返回默认配置', () => {

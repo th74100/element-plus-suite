@@ -14,4 +14,4 @@ export type {
   FormProProps,
   FormProSchemaItem,
   FormProValue,
-} from './types'
+} from './types/index'

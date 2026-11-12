@@ -20,8 +20,8 @@ export type {
   TableProToolbarOptions,
   TableProTreeProps,
   ResolvedTableProPagination,
-} from './types'
+} from './types/index'
 export {
   TABLE_PRO_DEFAULT_PAGINATION,
   normalizePagination,
-} from './types'
+} from './types/index'

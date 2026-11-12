@@ -25,7 +25,7 @@ import {
 } from 'element-plus'
 import { h } from 'vue'
 import CaptchaField from './captcha-field'
-import type { FormProCol, FormProColProps, FormProOption, FormProSchemaItem } from './types'
+import type { FormProCol, FormProColProps, FormProOption, FormProSchemaItem } from './types/index'
 
 type OptionData = FormProOption[] | (() => FormProOption[])
 

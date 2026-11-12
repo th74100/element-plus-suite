@@ -33,7 +33,7 @@ import type {
   FormProInternalConfig,
   FormProSchemaItem,
   FormProValue,
-} from './types'
+} from './types/index'
 
 const FORM_PRO_BUTTON_DEFAULTS = {
   form: {

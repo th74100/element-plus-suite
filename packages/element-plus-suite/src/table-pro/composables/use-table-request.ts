@@ -2,7 +2,7 @@ import { onBeforeUnmount, shallowRef } from 'vue'
 import type {
   TableProRequest,
   TableProRequestResult,
-} from '../types'
+} from '../types/index'
 
 interface UseTableRequestOptions<Row> {
   request: () => TableProRequest<Row> | undefined

@@ -8,7 +8,7 @@ import type {
   TableProSpanMethodParams,
   TableProTableInstance,
   TableProTableProps,
-} from '../types'
+} from '../types/index'
 import {
   calculateRowSpans,
   hasTreeRows,

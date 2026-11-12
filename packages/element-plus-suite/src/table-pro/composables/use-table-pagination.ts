@@ -2,7 +2,7 @@ import { computed, shallowRef, watch } from 'vue'
 import {
   normalizePagination,
   type TableProPagination,
-} from '../types'
+} from '../types/index'
 
 /**
  * 管理 TablePro 的分页状态。

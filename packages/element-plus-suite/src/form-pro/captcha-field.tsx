@@ -9,7 +9,7 @@ import {
   type VNodeChild,
 } from 'vue'
 import { ElButton, ElInput } from 'element-plus'
-import type { FormProCaptchaProps } from './types'
+import type { FormProCaptchaProps } from './types/index'
 
 export default defineComponent({
   name: 'FormProCaptchaField',
