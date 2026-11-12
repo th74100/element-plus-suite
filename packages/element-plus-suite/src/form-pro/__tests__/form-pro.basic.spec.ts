@@ -1,6 +1,6 @@
-import { h } from 'vue'
-import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it } from 'vitest'
+import { h, nextTick } from 'vue'
+import { flushPromises, mount } from '@vue/test-utils'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ElFormPro, type FormProConfig } from '../../index'
 
 describe('ElFormPro', () => {
@@ -33,7 +33,7 @@ describe('ElFormPro config', () => {
     })
 
     expect(wrapper.find('.el-col-12').exists()).toBe(true)
-    expect(wrapper.find('.el-form-pro__actions').exists()).toBe(false)
+    expect(wrapper.find('.eps-form-pro__actions').exists()).toBe(false)
   })
 })
 
@@ -71,7 +71,7 @@ describe('ElFormPro col shorthand', () => {
       },
     })
 
-    expect(wrapper.find('.el-col-12 .el-form-pro__actions').exists()).toBe(true)
+    expect(wrapper.find('.el-col-12 .eps-form-pro__actions').exists()).toBe(true)
   })
 })
 describe('ElFormPro default visibility', () => {
@@ -500,6 +500,26 @@ describe('ElFormPro responsive actions', () => {
 })
 
 
+describe('ElFormPro action button', () => {
+  it('buttons.submit.block 独占一行', () => {
+    const wrapper = mount(ElFormPro, {
+      props: {
+        schema: [{ key: 'keyword', label: '关键词', type: 'input' }],
+        formConfig: {
+          buttons: {
+            submit: { text: '提交', type: 'primary', block: true },
+            reset: false,
+          },
+        },
+      },
+    })
+
+    const button = wrapper.get('.eps-button-pro')
+    expect(button.classes()).toContain('is-block')
+    expect(wrapper.findComponent({ name: 'ElButtonPro' }).exists()).toBe(true)
+  })
+})
+
 describe('ElFormPro children', () => {
   it('组合渲染子字段并使用 separator 连接', () => {
     const wrapper = mount(ElFormPro, {
@@ -521,9 +541,9 @@ describe('ElFormPro children', () => {
       },
     })
 
-    expect(wrapper.find('.el-form-pro__children').exists()).toBe(true)
-    expect(wrapper.findAll('.el-form-pro__child')).toHaveLength(2)
-    expect(wrapper.find('.el-form-pro__separator').text()).toBe('-')
+    expect(wrapper.find('.eps-form-pro__children').exists()).toBe(true)
+    expect(wrapper.findAll('.eps-form-pro__child')).toHaveLength(2)
+    expect(wrapper.find('.eps-form-pro__separator').text()).toBe('-')
     expect((wrapper.vm as unknown as { getValues: () => Record<string, any> }).getValues()).toMatchObject({
       start: '2026-01-01',
       end: '2026-01-02',
@@ -556,14 +576,15 @@ describe('ElFormPro children', () => {
     })
 
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.el-form-pro__group.is-required.asterisk-left').exists()).toBe(true)
+    expect(wrapper.find('.eps-form-pro__group.is-required.asterisk-left').exists()).toBe(true)
 
     const items = wrapper.findAllComponents({ name: 'ElFormItem' })
-    expect(items.map(item => item.props('prop'))).toEqual(['date1', 'date2'])
-    expect(items[0].props('rules')).toEqual([
+    const childItems = items.filter(item => item.props('prop'))
+    expect(childItems.map(item => item.props('prop'))).toEqual(['date1', 'date2'])
+    expect(childItems[0].props('rules')).toEqual([
       { required: true, message: '请选择活动日期' },
     ])
-    expect(items[1].props('rules')).toBeUndefined()
+    expect(childItems[1].props('rules')).toBeUndefined()
     expect(wrapper.text()).not.toContain('activityTime is required')
     expect(wrapper.text()).not.toContain('请选择活动时间')
   })
@@ -584,7 +605,7 @@ describe('ElFormPro children', () => {
       },
     })
 
-    const group = wrapper.find('.el-form-pro__group')
+    const group = wrapper.find('.eps-form-pro__group')
     expect(group.classes()).toContain('is-required')
     expect(group.classes()).toContain('asterisk-right')
     expect(group.classes()).toContain('is-no-asterisk')
@@ -607,7 +628,7 @@ describe('ElFormPro children', () => {
       },
     })
 
-    expect(wrapper.find('.el-form-pro__children').exists()).toBe(true)
+    expect(wrapper.find('.eps-form-pro__children').exists()).toBe(true)
     expect((wrapper.vm as any).getValues()).toEqual({
       date1: undefined,
       date2: undefined,
@@ -691,7 +712,7 @@ describe('ElFormPro children', () => {
       },
     })
 
-    expect(wrapper.find('.el-form-pro__separator').text()).toBe('')
+    expect(wrapper.find('.eps-form-pro__separator').text()).toBe('')
   })
 })
 
@@ -861,9 +882,112 @@ describe('ElFormPro composed child visibility', () => {
     })
 
     expect(wrapper.findAll('input')).toHaveLength(1)
-    expect(wrapper.find('.el-form-pro__group').classes()).not.toContain('is-required')
+    expect(wrapper.find('.eps-form-pro__group').classes()).not.toContain('is-required')
   })
 })
+describe('ElFormPro captcha', () => {
+  it('未通过 phoneName 校验时不请求验证码', async () => {
+    const onGetCaptcha = vi.fn()
+    const wrapper = mount(ElFormPro, {
+      props: {
+        schema: [
+          {
+            key: 'phone',
+            label: '手机号',
+            type: 'input',
+            rules: [{ required: true, message: '请输入手机号' }],
+          },
+          {
+            key: 'captcha',
+            label: '验证码',
+            type: 'captcha',
+            fieldProps: {
+              phoneName: 'phone',
+              onGetCaptcha,
+            },
+          },
+        ],
+        modelValue: { phone: '', captcha: '' },
+        formConfig: {
+          buttons: { submit: false, reset: false },
+        },
+      },
+    })
+
+    await wrapper.vm.$nextTick()
+    await wrapper.get('.eps-form-pro__captcha-button').trigger('click')
+    await flushPromises()
+
+    expect(onGetCaptcha).not.toHaveBeenCalled()
+  })
+
+  it('使用 phoneName 对应值请求验证码并启动倒计时', async () => {
+    vi.useFakeTimers()
+    const onGetCaptcha = vi.fn().mockResolvedValue(undefined)
+    const onTiming = vi.fn()
+    const wrapper = mount(ElFormPro, {
+      props: {
+        schema: [
+          { key: 'phone', label: '手机号', type: 'input' },
+          {
+            key: 'captcha',
+            label: '验证码',
+            type: 'captcha',
+            fieldProps: {
+              phoneName: 'phone',
+              countDown: 3,
+              onGetCaptcha,
+              onTiming,
+            },
+          },
+        ],
+        modelValue: { phone: '13800000000', captcha: '' },
+        formConfig: {
+          buttons: { submit: false, reset: false },
+        },
+      },
+    })
+
+    await wrapper.get('.eps-form-pro__captcha-button').trigger('click')
+    await flushPromises()
+
+    expect(onGetCaptcha).toHaveBeenCalledWith('13800000000')
+    expect(wrapper.get('.eps-form-pro__captcha-button').text()).toContain('3 秒后重新获取')
+    expect(onTiming).toHaveBeenCalledWith(3)
+    expect(wrapper.get('.eps-form-pro__captcha-button').classes()).toContain('is-disabled')
+
+    vi.advanceTimersByTime(3000)
+    await nextTick()
+    expect(wrapper.get('.eps-form-pro__captcha-button').text()).toBe('获取验证码')
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
+  it('验证码输入值通过 modelValue 写回表单', async () => {
+    const wrapper = mount(ElFormPro, {
+      props: {
+        schema: [{
+          key: 'captcha',
+          label: '验证码',
+          type: 'captcha',
+          defaultValue: '',
+          fieldProps: {
+            onGetCaptcha: vi.fn(),
+          },
+        }],
+        formConfig: {
+          buttons: { submit: false, reset: false },
+        },
+      },
+    })
+
+    await wrapper.get('.eps-form-pro__captcha input').setValue('123456')
+    await nextTick()
+    expect((wrapper.vm as any).getValues()).toEqual({ captcha: '123456' })
+  })
+})
+
 describe('ElFormPro new field types', () => {
   it('transfer 使用 modelValue 双向绑定', () => {
     const wrapper = mount(ElFormPro, {

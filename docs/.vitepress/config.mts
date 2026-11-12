@@ -54,8 +54,17 @@ export default defineConfig({
     nav: [
       { text: '指南', link: '/guide/' },
       { text: '组件', link: '/components/table-pro/' },
+      { text: 'skills.md', link: '/skills/' },
     ],
     sidebar: {
+      '/skills/': [
+        {
+          text: '技能',
+          items: [
+            { text: 'skills.md', link: '/skills/' },
+          ],
+        },
+      ],
       '/guide/': [
         {
           text: '介绍',

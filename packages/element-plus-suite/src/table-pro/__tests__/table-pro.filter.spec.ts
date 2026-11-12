@@ -29,7 +29,7 @@ describe('TablePro filter', () => {
     })
 
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.el-table-pro').exists()).toBe(true)
+    expect(wrapper.find('.eps-table-pro').exists()).toBe(true)
     expect(wrapper.find('.el-form').exists()).toBe(true)
     expect(wrapper.find('input').exists()).toBe(true)
   })

@@ -46,7 +46,11 @@ import IconPlacementDemo from './demos/icon-placement.vue'
 
 ```vue
 <template>
-  <ElButtonPro type="primary" block>Button</ElButtonPro>
+  <ElButtonPro type="primary" block>Primary</ElButtonPro>
+  <ElButtonPro block>Default</ElButtonPro>
+  <ElButtonPro dashed block>Dashed</ElButtonPro>
+  <ElButtonPro text block>Text</ElButtonPro>
+  <ElButtonPro type="primary" link block>Link</ElButtonPro>
 </template>
 ```
 
@@ -222,8 +226,8 @@ function request() {
 | --- | --- | --- | --- |
 | block | 按钮是否独占一行 | `boolean` | `false` |
 | iconPlacement | 图标在文字前或文字后 | <ApiType type="string" signature="'start' &#124; 'end'" /> | `'start'` |
-| gradient | 渐变背景，支持 CSS 渐变字符串或起止颜色对象 | `string` / `ButtonProGradient` | - |
-| hoverGradient | 鼠标经过时的渐变背景；渐变覆盖层会淡出并显示该背景 | `string` / `ButtonProGradient` | - |
+| gradient | 渐变背景，支持 CSS 渐变字符串或起止颜色对象 | `string` \| `ButtonProGradient` | - |
+| hoverGradient | 鼠标经过时的渐变背景；渐变覆盖层会淡出并显示该背景 | `string` \| `ButtonProGradient` | - |
 
 更多属性请查看 [Element Plus Button](https://element-plus.org/zh-CN/component/button.html#button-attributes)
 

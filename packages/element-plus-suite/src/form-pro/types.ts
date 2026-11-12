@@ -1,4 +1,4 @@
-import type { FormInstance, FormProps } from 'element-plus'
+import type { ButtonProps, FormInstance, FormProps, InputProps } from 'element-plus'
 import type { Component, VNode, VNodeChild } from 'vue'
 
 export type FormProValue = Record<string, any>
@@ -38,6 +38,21 @@ export type FormProFieldType =
   | 'upload'
   | 'mention'
 
+export interface FormProCaptchaProps extends Partial<InputProps> {
+  /** 手机号字段的 key；配置后点击获取验证码会先校验该字段 */
+  phoneName?: string
+  /** 倒计时秒数 */
+  countDown?: number
+  /** 获取验证码；参数为 phoneName 对应字段的值 */
+  onGetCaptcha: (phone: string) => Promise<void>
+  /** 倒计时变化回调 */
+  onTiming?: (seconds: number) => void
+  /** 自定义获取验证码按钮文案 */
+  captchaTextRender?: (timing: boolean, seconds: number) => string
+  /** 获取验证码按钮属性 */
+  captchaProps?: ButtonProps
+}
+
 export interface FormProOption {
   label: string
   value: string | number | boolean
@@ -75,6 +90,8 @@ export interface FormProButtonOptions {
   plain?: boolean
   disabled?: boolean
   loading?: boolean
+  /** 按钮独占一行 */
+  block?: boolean
   [key: string]: any
 }
 

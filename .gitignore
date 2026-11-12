@@ -13,3 +13,5 @@ packages/*/dist/
 
 .npm-cache/
 consumer-check/
+# Local agent skills installed via `npx skills add`
+.agents/skills/

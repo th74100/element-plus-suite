@@ -24,6 +24,7 @@ import {
   ElUpload,
 } from 'element-plus'
 import { h } from 'vue'
+import CaptchaField from './captcha-field'
 import type { FormProCol, FormProColProps, FormProOption, FormProSchemaItem } from './types'
 
 type OptionData = FormProOption[] | (() => FormProOption[])
@@ -118,6 +119,7 @@ export const formProComponentMap: Record<string, any> = {
   transfer: ElTransfer,
   upload: UploadField,
   mention: ElMention,
+  captcha: CaptchaField,
 }
 
 export function resolveFormProComponent(item: FormProSchemaItem) {

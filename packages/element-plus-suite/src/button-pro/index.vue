@@ -10,6 +10,7 @@ import {
 import {
   ElButton,
   buttonProps,
+  useFormSize,
   type ButtonInstance,
 } from 'element-plus'
 import { exposeFrom, normalizeGradient } from './utils'
@@ -44,25 +45,19 @@ export default defineComponent({
   setup(props, { attrs, expose, slots }) {
     const buttonRef = shallowRef<ButtonInstance>()
     const loading = shallowRef(false)
+    const buttonSize = useFormSize()
 
     const forwardedAttrs = computed(() => {
       const { onClick: _onClick, ...rest } = attrs
       return rest
     })
 
-    const isSolidButton = computed(() => (
-      !props.plain
-      && !props.dashed
-      && !props.text
-      && !props.link
-      && props.type !== 'text'
-    ))
-
-    const gradientValue = computed(() => (
-      props.gradient && isSolidButton.value
-        ? normalizeGradient(props.gradient)
-        : ''
-    ))
+    /** 渐变只作用于实心按钮，避免覆盖其他按钮形态的交互背景。 */
+    const gradientValue = computed(() => {
+      const { gradient, plain, dashed, text, link, type } = props
+      if (!gradient || plain || dashed || text || link || type === 'text') return ''
+      return normalizeGradient(gradient)
+    })
 
     const hoverGradientValue = computed(() => (
       gradientValue.value && props.hoverGradient
@@ -75,9 +70,9 @@ export default defineComponent({
         return undefined
 
       return {
-        '--el-button-pro-gradient': gradientValue.value,
+        '--eps-button-pro-gradient': gradientValue.value,
         ...(hoverGradientValue.value && {
-          '--el-button-pro-hover-gradient': hoverGradientValue.value,
+          '--eps-button-pro-hover-gradient': hoverGradientValue.value,
         }),
       }
     })
@@ -94,15 +89,16 @@ export default defineComponent({
       return elementProps
     })
 
+    /** 点击返回 Promise 时自动维护 loading。 */
     async function handleClick(event: MouseEvent) {
-
       const onClick = attrs?.onClick
       if (typeof onClick !== 'function') return
 
       try {
         loading.value = true
         await onClick(event)
-      } finally {
+      }
+      finally {
         loading.value = false
       }
     }
@@ -118,7 +114,8 @@ export default defineComponent({
           ref: buttonRef,
           loading: props.loading || loading.value,
           class: [
-            'el-button-pro',
+            'eps-button-pro',
+            `eps-button-pro--${buttonSize.value || 'default'}`,
             {
               'is-block': props.block,
               'is-gradient': Boolean(gradientValue.value),

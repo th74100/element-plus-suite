@@ -62,7 +62,7 @@ describe('ElButtonPro', () => {
     const button = wrapper.get('button')
     expect(button.classes()).toContain('is-gradient')
     expect(button.attributes('style')).toContain(
-      `--el-button-pro-gradient: ${gradient}`,
+      `--eps-button-pro-gradient: ${gradient}`,
     )
   })
 
@@ -83,7 +83,7 @@ describe('ElButtonPro', () => {
     const button = wrapper.get('button')
     expect(button.classes()).not.toContain('is-gradient')
     expect(button.attributes('style') ?? '').not.toContain(
-      '--el-button-pro-gradient',
+      '--eps-button-pro-gradient',
     )
   })
   it('对象渐变写入 CSS 变量', () => {
@@ -98,7 +98,7 @@ describe('ElButtonPro', () => {
     })
 
     expect(wrapper.get('button').attributes('style')).toContain(
-      '--el-button-pro-gradient: linear-gradient(90deg, #6253e1, #04befe)',
+      '--eps-button-pro-gradient: linear-gradient(90deg, #6253e1, #04befe)',
     )
   })
 
@@ -114,7 +114,7 @@ describe('ElButtonPro', () => {
     const button = wrapper.get('button')
     expect(button.classes()).toContain('has-hover-gradient')
     expect(button.attributes('style')).toContain(
-      `--el-button-pro-hover-gradient: ${hoverGradient}`,
+      `--eps-button-pro-hover-gradient: ${hoverGradient}`,
     )
   })
 
@@ -131,7 +131,7 @@ describe('ElButtonPro', () => {
     })
 
     expect(wrapper.get('button').attributes('style')).toContain(
-      '--el-button-pro-hover-gradient: linear-gradient(90deg, #7c3aed, #06b6d4)',
+      '--eps-button-pro-hover-gradient: linear-gradient(90deg, #7c3aed, #06b6d4)',
     )
   })
 
@@ -146,7 +146,7 @@ describe('ElButtonPro', () => {
     expect(button.classes()).not.toContain('is-gradient')
     expect(button.classes()).not.toContain('has-hover-gradient')
     expect(button.attributes('style') ?? '').not.toContain(
-      '--el-button-pro-hover-gradient',
+      '--eps-button-pro-hover-gradient',
     )
   })
   it('iconPlacement 默认为 start', () => {
@@ -255,10 +255,10 @@ describe('ElButtonPro', () => {
 
     const button = wrapper.get('button')
     expect(button.attributes('style')).toContain(
-      `--el-button-pro-gradient: ${gradient}`,
+      `--eps-button-pro-gradient: ${gradient}`,
     )
     expect(button.attributes('style')).not.toContain(
-      '--el-button-pro-hover-gradient',
+      '--eps-button-pro-hover-gradient',
     )
   })
 
@@ -276,7 +276,7 @@ describe('ElButtonPro', () => {
     expect(button.classes()).toContain('is-disabled')
     expect(button.classes()).toContain('is-gradient')
     expect(button.attributes('style')).toContain(
-      `--el-button-pro-gradient: ${gradient}`,
+      `--eps-button-pro-gradient: ${gradient}`,
     )
   })
 

@@ -3,6 +3,7 @@ export type {
   FormProButtonConfig,
   FormProButtonOptions,
   FormProButtons,
+  FormProCaptchaProps,
   FormProCol,
   FormProColProps,
   FormProConfig,

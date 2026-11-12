@@ -7,7 +7,6 @@ export type {
   TableProFilterConfigExtension,
   TableProFilterConfig,
   TableProInstance,
-  TableProOwnInstance,
   TableProOwnProps,
   TableProPagination,
   TableProProps,
@@ -17,8 +16,8 @@ export type {
   TableProSpanMethod,
   TableProSpanMethodParams,
   TableProSpanMethodResult,
-  TableProTableInstance,
   TableProTableProps,
+  TableProToolbarOptions,
   TableProTreeProps,
   ResolvedTableProPagination,
 } from './types'
@@ -26,4 +25,3 @@ export {
   TABLE_PRO_DEFAULT_PAGINATION,
   normalizePagination,
 } from './types'
-

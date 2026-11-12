@@ -14,12 +14,12 @@ import {
   type VNodeChild,
 } from 'vue'
 import {
-  ElButton,
   ElCol,
   ElForm,
   ElFormItem,
   ElRow,
 } from 'element-plus'
+import { ElButtonPro } from '../button-pro'
 import {
   getFormProFieldProps,
   normalizeColumnProps,
@@ -37,10 +37,16 @@ import type {
 
 const FORM_PRO_BUTTON_DEFAULTS = {
   form: {
-    submitText: '提交',
+    type: 'primary',
+    text: '提交',
+    disabled: false,
+    loading: false,
   },
   search: {
-    submitText: '查询',
+    type: 'primary',
+    text: '查询',
+    disabled: false,
+    loading: false,
   },
   reset: {
     plain: true,
@@ -147,6 +153,42 @@ export default defineComponent({
       },
     })
 
+    /** 动态规则变化后，仅清理规则已变化字段的校验状态。 */
+    watch(
+      () => props.schema,
+      async (schema, previousSchema) => {
+        const previousRules = new Map<string, unknown>()
+
+        const collectRules = (items: FormProSchemaItem[]) => {
+          for (const item of items) {
+            if (item.key != null) previousRules.set(item.key, item.rules)
+            collectRules(item.children ?? [])
+          }
+        }
+
+        collectRules(previousSchema ?? [])
+        const changedFields: string[] = []
+        const compareRules = (items: FormProSchemaItem[]) => {
+          for (const item of items) {
+            if (item.key != null) {
+              const previousRule = JSON.stringify(previousRules.get(item.key) ?? null)
+              const currentRule = JSON.stringify(item.rules ?? null)
+              if (previousRule !== currentRule) changedFields.push(item.key)
+              previousRules.delete(item.key)
+            }
+            compareRules(item.children ?? [])
+          }
+        }
+
+        compareRules(schema)
+        if (!changedFields.length) return
+        await nextTick()
+        formRef.value?.clearValidate(changedFields)
+      },
+      { deep: true, flush: 'post' },
+    )
+
+
     watch(
       () => props.schema,
       (schema) => {
@@ -160,7 +202,7 @@ export default defineComponent({
     const fields = computed(() =>
       props.schema.filter((item) => !item.hidden),
     )
-
+    /** Element Plus 栅格和响应式 label 的断点。 */
     const GRID_BREAKPOINTS = [
       { key: 'sm', min: 768 },
       { key: 'md', min: 992 },
@@ -319,24 +361,11 @@ export default defineComponent({
 
     const buttons = computed(() => {
       const defaults = {
-        submit: {
-          type: 'primary',
-          text: props.searchMode
-            ? FORM_PRO_BUTTON_DEFAULTS.search.submitText
-            : FORM_PRO_BUTTON_DEFAULTS.form.submitText,
-          disabled: false,
-          loading: false,
-        },
-        reset: {
-          plain: true,
-          text: '重置',
-          disabled: false,
-        },
-        cancel: {
-          plain: true,
-          text: '取消',
-          disabled: false,
-        },
+        submit: props.searchMode
+          ? FORM_PRO_BUTTON_DEFAULTS.search
+          : FORM_PRO_BUTTON_DEFAULTS.form,
+        reset: FORM_PRO_BUTTON_DEFAULTS.reset,
+        cancel: FORM_PRO_BUTTON_DEFAULTS.cancel,
       }
       const resolveButton = (name: keyof typeof defaults) => {
         const config = formConfig.buttons?.[name]
@@ -367,10 +396,6 @@ export default defineComponent({
         : align === 'center' ? 'is-center' : 'is-end'
     })
 
-    const getColProps = (item: FormProSchemaItem) => {
-      return resolveColumnProps(item, formConfig)
-    }
-
     const updateField = (key: string, value: any) => {
       const next = {
         ...model.value,
@@ -382,8 +407,7 @@ export default defineComponent({
 
     const toRuleList = (rules: any): any[] =>
       Array.isArray(rules) ? rules : rules ? [rules] : []
-
-    /** 收集组合字段下所有叶子字段。 */
+    /** 组合字段的必填状态由可见叶子字段决定。 */
     const getLeafChildren = (item: FormProSchemaItem): FormProSchemaItem[] => {
       const result: FormProSchemaItem[] = []
       const walk = (items: FormProSchemaItem[]) => {
@@ -410,7 +434,7 @@ export default defineComponent({
     ) => {
       if (!options) return null
       return h(
-        ElButton,
+        ElButtonPro,
         {
           ...omit(options, ['text']),
           onClick,
@@ -418,6 +442,24 @@ export default defineComponent({
         () => options.text,
       )
     }
+    /** 验证码字段由 FormPro 先校验手机号字段，再交给 CaptchaField 发送验证码。 */
+    const getCaptchaPhone = async (phoneName?: string) => {
+      if (!phoneName) return ''
+      if (!formRef.value) throw new Error('FormPro is not mounted')
+      const phone = String(model.value[phoneName] ?? '')
+      if (!phone.trim()) {
+        try {
+          await formRef.value.validateField(phoneName)
+        }
+        catch {
+          // 由 ElFormItem 展示校验错误。
+        }
+        throw new Error('Phone is empty')
+      }
+      await formRef.value.validateField(phoneName)
+      return phone
+    }
+
     const renderControl = (item: FormProSchemaItem): VNodeChild => {
       // slot 替换整个控件；未显式配置时兼容用字段 key 作为插槽名。
       const directSlot = slots[item.slot ?? item.key ?? '']
@@ -428,6 +470,9 @@ export default defineComponent({
 
       // fieldProps.slots 将 ElFormPro 的插槽转发到控件内部，例如 ElInput 的 prefix。
       const { slots: fieldSlotMap, ...fieldProps } = getFormProFieldProps(item)
+      if (item.type === 'captcha') {
+        fieldProps.getPhone = () => getCaptchaPhone(fieldProps.phoneName)
+      }
       const fieldSlots = Object.fromEntries(
         Object.entries(fieldSlotMap ?? {}).flatMap(([name, source]) => {
           const slot = typeof source === 'function'
@@ -455,43 +500,22 @@ export default defineComponent({
       typeof item.label === 'function' ? item.label() : item.label
 
     const renderComposedField = (item: FormProSchemaItem): VNodeChild => {
-      const labelPosition = responsiveLabelPosition.value
       return h(
-        'div',
+        ElFormItem,
         {
-          class: [
-            'el-form-item',
-            `el-form-item--label-${labelPosition}`,
-            'el-form-pro__group',
-            {
-              'is-required': item.formItemProps?.required
-                ?? hasRequiredChild(item),
-              'is-no-asterisk': formConfig.hideRequiredAsterisk,
-              'asterisk-right': formConfig.requireAsteriskPosition === 'right',
-              'asterisk-left': formConfig.requireAsteriskPosition !== 'right',
-            },
-          ],
+          ...(item.formItemProps ?? {}),
+          label: typeof item.label === 'function' ? undefined : item.label,
+          labelWidth: item.labelWidth ?? formConfig.labelWidth,
+          required: item.formItemProps?.required ?? hasRequiredChild(item),
+          class: ['eps-form-pro__group', item.formItemProps?.class],
           style: item.style,
         },
-        [
-          item.label
-            ? h(
-                'div',
-                {
-                  class: 'el-form-item__label',
-                  style: labelPosition === 'top'
-                    ? undefined
-                    : { width: item.labelWidth ?? formConfig.labelWidth },
-                },
-                [renderLabel(item)],
-              )
-            : null,
-          h(
-            'div',
-            { class: 'el-form-item__content' },
-            [renderField(item)],
-          ),
-        ],
+        {
+          ...(typeof item.label === 'function'
+            ? { label: () => renderLabel(item) }
+            : {}),
+          default: () => renderField(item),
+        },
       )
     }
     const renderChildField = (item: FormProSchemaItem): VNodeChild => {
@@ -504,7 +528,7 @@ export default defineComponent({
           prop: item.key,
           rules: item.rules,
           labelWidth: item.labelWidth ?? formConfig.labelWidth,
-          class: [item.formItemProps?.class, 'el-form-pro__child'],
+          class: [item.formItemProps?.class, 'eps-form-pro__child'],
           style: item.style,
         },
         { default: () => renderControl(item) },
@@ -516,12 +540,12 @@ export default defineComponent({
 
       return h(
         'div',
-        { class: 'el-form-pro__children' },
+        { class: 'eps-form-pro__children' },
         item.children.filter((child) => !child.hidden).flatMap((child, index) => {
           const control = h(
             'div',
             {
-              class: 'el-form-pro__child-wrapper',
+              class: 'eps-form-pro__child-wrapper',
               key: child.key,
             },
             [renderChildField(child)],
@@ -531,7 +555,7 @@ export default defineComponent({
           return [
             h(
               'span',
-              { class: 'el-form-pro__separator' },
+              { class: 'eps-form-pro__separator' },
               item.separator ?? '',
             ),
             control,
@@ -550,12 +574,10 @@ export default defineComponent({
       })
     }
 
-    const validate = (...args: any[]) => formRef.value?.validate(...args)
-    const validateField = (...args: any[]) => formRef.value?.validateField(...args)
 
     const onSubmit = async () => {
       try {
-        await validate()
+        await formRef.value?.validate()
         emit('submit', model.value)
       }
       catch {
@@ -597,86 +619,169 @@ export default defineComponent({
       return { ...model.value, ...childDefaults }
     }
 
-    const onReset = () => {
-      const values = resetFields()
-      emit('reset', values)
-    }
-
+    const onReset = () => emit('reset', resetFields())
     const onCancel = () => emit('cancel')
-
-    const setState = (options: FormProConfig) => {
-      Object.assign(formConfig, options)
-    }
+    const setState = (options: FormProConfig) => Object.assign(formConfig, options)
 
     const getValues = () => model.value
 
-    const measure = () => {
-      const el = formRef.value?.$el as HTMLElement | undefined
-      if (typeof window !== 'undefined') viewportWidth.value = window.innerWidth
-    }
-
-    const resizeObserver = typeof ResizeObserver === 'undefined'
-      ? null
-      : new ResizeObserver(measure)
-
-    watch(
-      () => formRef.value?.$el,
-      (el: HTMLElement | undefined) => {
-        resizeObserver?.disconnect()
-        if (el) resizeObserver?.observe(el)
-        measure()
-      },
-      { flush: 'post' },
-    )
-
+    /** 响应式 label 和栅格都按视口宽度计算。 */
     const handleResize = () => {
-      if (typeof window !== 'undefined') viewportWidth.value = window.innerWidth
-      measure()
+      viewportWidth.value = window.innerWidth
     }
 
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', handleResize)
     }
     onBeforeUnmount(() => {
-      resizeObserver?.disconnect()
       if (typeof window !== 'undefined') window.removeEventListener('resize', handleResize)
     })
 
     const exposed: FormProInstance = {
-      validate: (...args) => validate(...args),
-      validateField: (...args) => validateField(...args),
-      resetFields: (...args) => {
-        resetFields(...args)
-      },
-      clearValidate: (...args) => {
-        formRef.value?.clearValidate(...args)
-      },
+      validate: (...args) => formRef.value?.validate(...args),
+      validateField: (...args) => formRef.value?.validateField(...args),
+      resetFields: (...args) => resetFields(...args),
+      clearValidate: (...args) => formRef.value?.clearValidate(...args),
       scrollToError,
       setState,
       getValues,
     }
     expose(exposed)
 
+    const renderFormItem = (item: FormProSchemaItem) =>
+      h(
+        ElFormItem,
+        {
+          ...(item.formItemProps ?? {}),
+          label: typeof item.label === 'function' ? undefined : item.label,
+          labelWidth: item.labelWidth ?? formConfig.labelWidth,
+          prop: item.key,
+          rules: item.rules,
+          class: item.formItemProps?.class,
+          style: item.style,
+        },
+        {
+          ...(typeof item.label === 'function'
+            ? { label: () => renderLabel(item) }
+            : {}),
+          default: () => renderControl(item),
+        },
+      )
+
+    const renderFieldColumn = (item: FormProSchemaItem) =>
+      h(
+        ElCol,
+        {
+          ...resolveColumnProps(item, formConfig),
+          key: item.key ?? item.children?.[0]?.key,
+        },
+        {
+          default: () => item.children?.length
+            ? renderComposedField(item)
+            : renderFormItem(item),
+        },
+      )
+
+    const renderCollapseButton = () => {
+      const canToggle = props.collapsible &&
+        formConfig.showCollapseButton &&
+        fields.value.length > showLength.value
+      if (!canToggle) return null
+
+      return h(
+        ElButtonPro,
+        {
+          type: 'primary',
+          link: true,
+          onClick: () => {
+            isExpanded.value = !isExpanded.value
+          },
+        },
+        () => isExpanded.value ? '收起' : '展开',
+      )
+    }
+
+    const renderActionContent = () => {
+      const actionButtons = slots.buttons
+        ? slots.buttons()
+        : [
+            renderActionButton(
+              buttons.value.submit,
+              () => void onSubmit(),
+            ),
+            renderActionButton(buttons.value.reset, onReset),
+            renderActionButton(buttons.value.cancel, onCancel),
+          ]
+
+      return [actionButtons, renderCollapseButton()]
+    }
+
+    const renderActions = () => {
+      if (!hasButtons.value || !fields.value.length) return null
+
+      return h(
+        ElCol,
+        actionCol.value,
+        {
+          default: () => h(
+            ElFormItem,
+            null,
+            {
+              ...(showActionLabel.value
+                ? {
+                    label: () =>
+                      h('label', { class: 'eps-form-pro__actions-label' }),
+                  }
+                : {}),
+              default: () => h(
+                'div',
+                {
+                  class: [
+                    'eps-form-pro__actions',
+                    actionAlignClass.value,
+                  ],
+                },
+                renderActionContent(),
+              ),
+            },
+          ),
+        },
+      )
+    }
+
+    const renderFormRow = () =>
+      h(
+        ElRow,
+        {
+          gutter: 18,
+          ...(formConfig.row ?? {}),
+        },
+        {
+          default: () => [
+            ...visibleFields.value.map(renderFieldColumn),
+            renderActions(),
+          ],
+        },
+      )
+
     return () => {
-      const formProps = {
-        ...omit(formConfig, [
-          'buttonAlign',
-          'buttons',
-          'row',
-          'col',
-          'showCollapseButton',
-          'collapseRows',
-          'collapseCount',
-          'collapsed',
-          'actionCol',
-        ]),
-      }
+      const formProps = omit(formConfig, [
+        'buttonAlign',
+        'buttons',
+        'row',
+        'col',
+        'showCollapseButton',
+        'collapseRows',
+        'collapseCount',
+        'collapsed',
+        'actionCol',
+      ])
 
       return h(
         ElForm,
         {
           ...formProps,
-          class: ['el-form-pro', formProps.class].filter(Boolean),
+          class: ['eps-form-pro', formProps.class].filter(Boolean),
           labelPosition: responsiveLabelPosition.value,
           ref: formRef,
           model: model.value,
@@ -684,118 +789,9 @@ export default defineComponent({
             event.preventDefault()
             void onSubmit()
           },
-        } as any,        {
-          default: () => [
-            h(
-              ElRow,
-              {
-                gutter: 18,
-                ...(formConfig.row ?? {}),
-              },
-              {
-                default: () => [
-                  ...visibleFields.value.map((item) =>
-                    h(
-                      ElCol,
-                      {
-                        ...getColProps(item),
-                        key: item.key ?? item.children?.[0]?.key,
-                      },
-                      {
-                        default: () => item.children?.length
-                          ? renderComposedField(item)
-                          : h(
-                              ElFormItem,
-                              {
-                                ...(item.formItemProps ?? {}),
-                                label: typeof item.label === 'function'
-                                  ? undefined
-                                  : item.label,
-                                labelWidth: item.labelWidth ?? formConfig.labelWidth,
-                                prop: item.key,
-                                rules: item.rules,
-                                class: item.formItemProps?.class,
-                                style: item.style,
-                              },
-                              {
-                                ...(typeof item.label === 'function'
-                                  ? { label: () => renderLabel(item) }
-                                  : {}),
-                                default: () => renderControl(item),
-                              },
-                            ),
-                      },
-                    ),
-                  ),
-                  hasButtons.value && fields.value.length
-
-                    ? h(
-                        ElCol,
-                        actionCol.value,
-                        {
-                          default: () =>
-                            h(
-                              ElFormItem,
-                              null,
-                              {
-                                ...(showActionLabel.value
-                                  ? {
-                                      label: () =>
-                                        h('label', { class: 'el-form-pro__actions-label' }),
-                                    }
-                                  : {}),
-                                default: () =>
-                                  h(
-                                    'div',
-                                    {
-                                      class: [
-                                        'el-form-pro__actions',
-                                        actionAlignClass.value,
-                                      ],
-                                    },
-                                    [
-                                      slots.buttons
-                                        ? slots.buttons()
-                                        : [
-                                            renderActionButton(
-                                              buttons.value.submit,
-                                              () => void onSubmit(),
-                                            ),
-                                            renderActionButton(
-                                              buttons.value.reset,
-                                              onReset,
-                                            ),
-                                            renderActionButton(
-                                              buttons.value.cancel,
-                                              onCancel,
-                                            ),
-                                          ],
-                                      props.collapsible &&
-                                      formConfig.showCollapseButton &&
-                                      fields.value.length > showLength.value
-                                        ? h(
-                                            ElButton,
-                                            {
-                                              type: 'primary',
-                                              link: true,
-                                              onClick: () => {
-                                                isExpanded.value = !isExpanded.value
-                                              },
-                                            },
-                                            () => isExpanded.value ? '收起' : '展开',
-                                          )
-                                        : null,
-                                    ],
-                                  ),
-                              },
-                            ),
-                        },
-                      )
-                    : null,
-                ],
-              },
-            ),
-          ],
+        } as any,
+        {
+          default: () => [renderFormRow()],
         },
       )
     }

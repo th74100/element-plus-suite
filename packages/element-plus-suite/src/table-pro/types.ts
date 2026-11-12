@@ -195,6 +195,14 @@ export interface TableProFilterConfigExtension extends FormProConfig {
   collapsed?: boolean
 }
 
+export interface TableProToolbarOptions {
+  /** 显示刷新按钮 */
+  reload?: boolean
+  /** 显示密度切换按钮，内部维护 table size */
+  density?: boolean
+  /** 显示全屏切换按钮 */
+  fullscreen?: boolean
+}
 export interface TableProFilterConfig<Query = Record<string, any>> {
   schema: FormProSchemaItem[]
   formConfig?: TableProFilterConfigExtension
@@ -204,6 +212,11 @@ export interface TableProFilterConfig<Query = Record<string, any>> {
 
 export interface TableProOwnProps<Row, Query = Record<string, any>> {
   columns?: TableProColumn<Row>[]
+  /** 标题栏标题；存在 #headerTitle 插槽时由插槽完全替换 */
+  headerTitle?: string | (() => VNodeChild)
+  /** 标题栏内置工具配置；false 时隐藏所有内置工具 */
+  options?: false | TableProToolbarOptions
+
   request?: TableProRequest<Row, Query>
   pagination?: boolean | TableProPagination
   /** 按数组顺序依次合并连续同值字段 */

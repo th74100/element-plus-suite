@@ -4,6 +4,8 @@ description: 基于 Element Plus 的表格组件，支持列定义、分页和�
 ---
 <script setup lang="ts">
 import BasicDemo from './demos/basic.vue'
+import TitleBarDemo from './demos/title-bar.vue'
+import CustomToolbarDemo from './demos/custom-toolbar.vue'
 import FilteredDemo from './demos/filtered.vue'
 import FilterSlotDemo from './demos/filter-slot.vue'
 import RemoteDemo from './demos/remote.vue'
@@ -21,6 +23,10 @@ import EventsDemo from './demos/events.vue'
 # Table 表格
 
 ElTablePro 的诞生是为了解决项目中需要写很多 Table 的样板代码的问题，所以在其中封装了很多常用的逻辑。这些封装可以简单的分类为预设行为与预设逻辑。
+
+依托于 ElFormPro 的能力，ElTablePro 的筛选区可以非常方便的进行配置。
+
+![ElTablePro 结构](/table-pro.png)
 
 ## 基础用法
 通过配置快速生成表格
@@ -66,9 +72,75 @@ const dataSource: Member[] = [
 </Demo>
 
 
+## 标题栏，工具栏
+
+通过 `headerTitle` 和 `options` 来配置标题栏和工具栏
+
+<Demo>
+  <TitleBarDemo />
+  <template #code>
+
+```vue
+<script setup lang="ts">
+import { Plus } from '@element-plus/icons-vue'
+import type {
+  TableProColumn,
+  TableProRequest,
+} from 'element-plus-suite'
+
+interface Member {
+  id: number
+  name: string
+  role: string
+}
+
+const columns: TableProColumn<Member>[] = [
+  { prop: 'name', label: '姓名', minWidth: 140 },
+  { prop: 'role', label: '角色', minWidth: 140 },
+]
+
+const dataSource: Member[] = [
+  { id: 1, name: '林晓', role: '产品设计' },
+  { id: 2, name: '陈默', role: '前端开发' },
+  { id: 3, name: '周宁', role: '数据分析' },
+]
+
+const requestMembers: TableProRequest<Member> = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: dataSource,
+        total: dataSource.length,
+      })
+    }, 1500)
+  })
+}
+</script>
+
+<template>
+  <ElTablePro
+    headerTitle="成员列表"
+    :columns="columns"
+    :request="requestMembers"
+    :options="{
+      reload: true,
+      density: true,
+      fullscreen: true,
+    }"
+    row-key="id"
+    :pagination="false"
+    border
+  />
+</template>
+
+```
+
+  </template>
+</Demo>
+
 ## 请求数据源
 
-`request` 是 ElTablePro 最重要的 API。它接收 `page`、`pageSize` 和 `signal`，返回值必须包含 `data` 与 `total`。
+`request` 是 ElTablePro 最重要的 API。它接收 `page`、`pageSize` 和 `signal`，返回值必须包含 `data` 和 `total`。
 
 <Demo>
   <RemoteDemo />
@@ -316,7 +388,14 @@ const requestProducts: TableProRequest<Product, ProductQuery> = async ({
 
 ### 自定义筛选字段
 
-ElTablePro 会将 `filter-*`（* 代表 schema 中的 key）前缀的插槽转发给内部 ElFormPro。下面示例使用插槽自定义搜索项。
+ElTablePro 会将 `filter-*` 插槽转发给内部 ElFormPro。字段优先使用 `schema.slot` 作为插槽名；未设置 `slot` 时使用 `schema.key`。
+
+| schema 配置 | ElTablePro 插槽 |
+| --- | --- |
+| `{ key: 'status' }` | `#filter-status` |
+| `{ key: 'status', slot: 'status-field' }` | `#filter-status-field` |
+
+下面示例使用插槽自定义搜索项。
 
 <Demo>
   <FilterSlotDemo />
@@ -844,7 +923,7 @@ const dataSource: Project[] = [
 
 ### mergeFields 多级合并（建议开启全边框）
 
-通过 `mergeFields` 配置多级合并：
+通过 `mergeFields` 配置多级合并
 
 <Demo>
   <MergeDemo />
@@ -932,11 +1011,74 @@ const dataSource: Project[] = [
   />
 </template>
 ```
-
   </template>
 </Demo>
 
+### Toolbar 自定义
+<Demo>
+  <CustomToolbarDemo/>
+  <template #code>
 
+```vue
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
+import {
+    ElFormPro,
+    type TableProColumn,
+    type TableProRequest
+} from 'element-plus-suite'
+
+interface Task {
+  id: number
+  title: string
+  date: string
+}
+
+const columns: TableProColumn<Member>[] = [
+  { prop: 'title', label: '任务', minWidth: 140 },
+  { prop: 'date', label: '部署时间', minWidth: 140 },
+]
+
+const dataSource: Task[] = [
+  { id: 1, title: '部署测试环境', date: '2026-11-12' },
+  { id: 2, title: '发布正式版本', date: '2026-11-14' },
+]
+
+const requestTasks: TableProRequest<Task> = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: dataSource,
+        total: dataSource.length,
+      })
+    }, 1000)
+  })
+}
+</script>
+
+<template>
+  <ElTablePro
+    headerTitle="任务"
+    :columns="columns"
+    :request="requestTasks"
+    :options="{
+      reload: true,
+      density: true,
+      fullscreen: true,
+    }"
+    row-key="id"
+    :pagination="false"
+    border
+  >
+    <template #toolbar>
+      <ElButtonPro type="primary" :icon="Plus">新增</ElButtonPro>
+    </template>
+  </ElTablePro>
+</template>
+```
+  </template>
+</Demo>
 
 ## API
 
@@ -946,34 +1088,18 @@ ElTablePro 在 Element Plus 的 Table 上进行了一层封装，支持了一些
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| data | Table 的数据，ElTablePro 推荐使用 request 来加载 | `Row[]` | [] |
-| request | 远程表数据请求函数 | `TableProRequest<Row, Query>`/ `undefined` |
-| query | 已应用的检索条件对象 | `Query` | &#123;&#125; |
-| filter | 筛选表单配置 | `TableProFilterConfig<Query>` | `undefined` |
-| columns | 列配置 | `TableProColumn<Row>[]` | [] |
-| rowKey | 行唯一标识 | `string` / `(row) => string` / `number` | - |
-| pagination | 分页配置，`false` 时隐藏分页 | `boolean` \\| `TableProPagination` | true |
-| mergeFields | 按顺序逐级合并连续同值的字段 | `string[]` | [] |
+| columns | 列配置能力，一个数组 | `TableProColumn<Record<string, any>>[]` | `[]` |
+| data | Table 的数据，ElTablePro 推荐使用 request 来加载 | `Record<string, any>[]` | `[]` |
+| request | 远程获取 `data` 的方法 | `TableProRequest<Record<string, any>, Record<string, any>>` \| `undefined` | `undefined` |
+| query | 已应用的检索条件对象 | `Record<string, any>` | `{}` |
+| filter | 筛选表单配置 | `TableProFilterConfig<Record<string, any>>` | `undefined` |
+| headerTitle | Table 左上角的标题 | `string \| (() => VNodeChild)` | - |
+| options | Table 工具栏，设为 false 时不显示 | `{ reload?: boolean, density?: boolean, fullscreen?: boolean }` | `{ reload: false, density: false, fullscreen: false }` |
+| rowKey | 行唯一标识 | `string` \| `((row: Record<string, any>) => string \| number)` | - |
+| pagination | 分页配置，`false` 时隐藏分页 | `boolean` \| `TableProPagination` | `true` |
+| mergeFields | 按顺序逐级合并连续同值的字段 | `string[]` | `[]` |
 
 更多属性请参考 [**Element Plus Table**](https://element-plus.org/zh-CN/component/table#table-%E5%B1%9E%E6%80%A7)。
-
-### TableProFilterConfig
-
-| 属性名 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| schema | 筛选表单的字段配置 | `FormProSchemaItem[]` | - |
-| model | 筛选表单的当前值 | `Query` | &#123;&#125; |
-| defaultValue | 筛选表单的初始值 | `Query` | &#123;&#125; |
-| formConfig | 筛选表单的布局和折叠配置 | `TableProFilterConfigExtension` | - |
-
-TableProFilterConfigExtension 在 FormProConfig 基础上增加以下筛选配置：
-
-| 属性名 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| showCollapseButton | 是否显示展开/收起按钮 | `boolean` | false |
-| collapseRows | 收起时显示的行数 | `number` | 1 |
-| collapseCount | 收起时显示的字段数量；优先级高于 collapseRows | `number` | - |
-| collapsed | 是否默认收起 | `boolean` | true |
 
 ### TableProColumn
 
@@ -987,7 +1113,7 @@ TableProFilterConfigExtension 在 FormProConfig 基础上增加以下筛选配�
 | render | 使用渲染函数生成单元格内容 | `(scope) => VNodeChild` | - |
 | headerRender | 使用渲染函数生成表头内容 | `(scope) => VNodeChild` | - |
 | autoMerge | 当前列是否合并连续同值 | `boolean` | false |
-| children | 分组表头的子列 | `TableProColumn<Row>[]` | - |
+| children | 分组表头的子列 | `TableProColumn<Record<string, any>>[]` | - |
 
 更多属性请参考 [**Element Plus Table-column API**](https://element-plus.org/zh-CN/component/table#table-column-api)。
 
@@ -1011,18 +1137,43 @@ type TableProRequest<Row, Query = Record<string, any>> = (params: {
 
 | 参数名 | 说明 | 类型 |
 | --- | --- | --- |
-| page | 当前页码 | `number` / `null` |
-| pageSize | 每页条数 | `number` / `null` |
+| page | 当前页码 | `number` \| `null` |
+| pageSize | 每页条数 | `number` \| `null` |
+| query | 已应用的检索条件 | `Record<string, any>` |
 | signal | 用于取消请求的信号 | `AbortSignal` |
-
-`signal` 由组件自动提供。请求函数不需要取消能力时，可以不解构这个参数。
 
 #### 返回值
 
 | 字段名 | 说明 | 类型 |
 | --- | --- | --- |
-| data | 表数据 | `Row[]` |
+| data | 表数据 | `Record<string, any>[]` |
 | total | 数据总条数 | `number` |
+
+### TableProFilterConfig
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| schema | 筛选表单的字段配置 | `FormProSchemaItem[]` | - |
+| model | 筛选表单的当前值 | `Record<string, any>` | &#123;&#125; |
+| defaultValue | 筛选表单的初始值 | `Record<string, any>` | &#123;&#125; |
+| formConfig | 筛选表单的布局和折叠配置 | `TableProFilterConfigExtension` | - |
+
+`TableProFilterConfigExtension` 在 `FormProConfig` 基础上增加以下筛选配置：
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| showCollapseButton | 是否显示展开/收起按钮 | `boolean` | false |
+| collapseRows | 收起时显示的行数 | `number` | 1 |
+| collapseCount | 收起时显示的字段数量；优先级高于 collapseRows | `number` | - |
+| collapsed | 是否默认收起 | `boolean` | true |
+
+### TableProToolbarOptions
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| reload | 是否显示刷新工具 | `boolean` | `false` |
+| density | 是否显示密度工具 | `boolean` | `false` |
+| fullscreen | 是否显示全屏工具 | `boolean` | `false` |
 
 ### TableProPagination
 
@@ -1036,6 +1187,13 @@ type TableProRequest<Row, Query = Record<string, any>> = (params: {
 | background | 是否为页码添加背景色 | `boolean` | true |
 
 更多分页配置请参考 [**Element Plus Pagination**](https://element-plus.org/zh-CN/component/pagination.html)。
+
+### Slots
+
+| 插槽名 | 说明 | 作用域 |
+| --- | --- | --- |
+| `headerTitle` | 自定义 Table 左上角的标题 | - |
+| `toolbar` | 自定义自己的业务操作区 | `{ selectedRows, selectedRowKeys }` |
 
 ### Events
 

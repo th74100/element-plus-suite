@@ -8,6 +8,8 @@ import BasicDemo from './demos/basic.vue'
 import SlotsDemo from './demos/slots.vue'
 import RenderDemo from './demos/render.vue'
 import RulesDemo from './demos/rules.vue'
+import CaptchaDemo from './demos/captcha.vue'
+import DynamicDemo from './demos/dynamic.vue'
 </script>
 
 # Form 表单
@@ -459,6 +461,249 @@ function handleSubmit(values: Record<string, any>) {
   </template>
 </Demo>
 
+## 验证码
+
+通过 `type: 'captcha'` 生成验证码输入框
+
+<Demo>
+  <CaptchaDemo />
+  <template #code>
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import {
+  ElFormPro,
+  type FormProConfig,
+  type FormProSchemaItem,
+} from 'element-plus-suite'
+
+const schema: FormProSchemaItem[] = [
+  {
+    key: 'phone',
+    label: '手机号',
+    defaultValue: '',
+    col: 24,
+    rules: [
+      { required: true, message: '请输入手机号', trigger: 'blur' },
+      {
+        pattern: /^1\d{10}$/,
+        message: '请输入正确的手机号',
+        trigger: 'blur',
+      },
+    ],
+  },
+  {
+    key: 'captcha',
+    label: '验证码',
+    type: 'captcha',
+    defaultValue: '',
+    col: 24,
+    rules: [
+      { required: true, message: '请输入验证码', trigger: 'blur' },
+    ],
+    fieldProps: {
+      phoneName: 'phone',
+      countDown: 60,
+      placeholder: '请输入验证码',
+      async onGetCaptcha(phone: string) {
+        await new Promise((resolve) => setTimeout(resolve, 800))
+        ElMessage.success(`手机号 ${phone} 验证码发送成功!`)
+      },
+    },
+  },
+]
+
+const formConfig: FormProConfig = {
+  labelWidth: 90,
+  labelPosition: 'top',
+  actionCol: {
+    style: {
+      marginTop: '10px',
+    },
+  },
+  buttons: {
+    submit: {
+      text: '登 录',
+      type: 'primary',
+      size: 'large',
+      block: true,
+      gradient: {
+        from: '#6253e1',
+        to: '#04befe'
+      }
+    },
+    reset: false,
+  },
+}
+
+const submittedValues = ref('')
+
+function onSubmit(values: Record<string, any>) {
+  submittedValues.value = JSON.stringify(values, null, 2)
+}
+</script>
+
+<template>
+  <ElFormPro
+    :schema="schema"
+    :form-config="formConfig"
+    @submit="onSubmit"
+  />
+
+  <pre v-if="submittedValues">{{ submittedValues }}</pre>
+</template>
+
+```
+
+  </template>
+</Demo>
+
+
+## 表单动态联动
+
+通过 `computed` 生成 schema，可以按当前表单值动态控制字段显示、禁用、校验和选项，并实时派生另一字段的校验规则。
+
+<Demo>
+  <DynamicDemo />
+  <template #code>
+
+```vue
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import {
+  ElFormPro,
+  type FormProConfig,
+  type FormProSchemaItem,
+} from 'element-plus-suite'
+
+const model = ref({
+  showContact: true,
+  contactLocked: false,
+  requireRemark: false,
+  showMoreChannels: false,
+  channel: '1',
+  contact: '',
+  remark: '',
+  followUp: '',
+})
+
+const formConfig: FormProConfig = {
+  labelWidth: 110,
+  col: 12,
+  buttons: {
+    submit: { text: '提交', type: 'primary' },
+    reset: { text: '重置' },
+  },
+}
+
+const schema = computed<FormProSchemaItem[]>(() => [
+  {
+    key: 'showMoreChannels',
+    label: '显示更多渠道',
+    type: 'switch',
+    col: 6,
+  },
+  {
+    key: 'showContact',
+    label: '显示联系方式',
+    type: 'switch',
+    col: 6,
+  },
+  {
+    key: 'contactLocked',
+    label: '禁用联系方式',
+    type: 'switch',
+    col: 6,
+  },
+  {
+    key: 'requireRemark',
+    label: '备注必填',
+    type: 'switch',
+    col: 6,
+  },
+  {
+    key: 'channel',
+    label: '联系渠道',
+    type: 'select',
+    col: 12,
+    fieldProps: {
+      options: [
+        { label: '电话', value: '1' },
+        { label: '邮件', value: '2' },
+        ...(model.value.showMoreChannels
+          ? [{ label: '企业微信', value: '3' }]
+          : []),
+      ],
+    },
+  },
+  {
+    key: 'contact',
+    label: '联系方式',
+    type: 'input',
+    hidden: !model.value.showContact,
+    col: 12,
+    rules: [
+      { required: true, message: '请输入联系方式', trigger: ['blur', 'change'] },
+    ],
+    fieldProps: {
+      disabled: model.value.contactLocked,
+      placeholder: model.value.contactLocked ? '已禁用' : '请输入联系方式',
+    },
+  },
+  {
+    key: 'remark',
+    label: '备注',
+    type: 'input',
+    col: 12,
+    rules: [
+      {
+        required: model.value.requireRemark,
+        message: '请输入备注',
+        trigger: ['blur', 'change'],
+      },
+    ],
+  },
+  {
+    key: 'followUp',
+    label: '跟进说明',
+    type: 'input',
+    col: 12,
+    rules: [
+      {
+        required: !!model.value.contact,
+        message: '填写联系方式后，请补充跟进说明',
+        trigger: ['blur', 'change'],
+      },
+    ],
+    fieldProps: {
+      placeholder: model.value.contact ? '请补充跟进说明' : '选填',
+    },
+  },
+])
+
+function handleSubmit(values: Record<string, any>) {
+  console.log('dynamic form submit', values)
+}
+</script>
+
+<template>
+  <ElFormPro
+    v-model="model"
+    :schema="schema"
+    :form-config="formConfig"
+    @submit="handleSubmit"
+  />
+</template>
+```
+
+  </template>
+</Demo>
+
+::: tip
+联动字段使用 `v-model` 时，schema 才能实时读取最新值。schema 建议使用 `computed` 派生，不要直接修改原数组。
+:::
 ## API
 
 ElFormPro 在 Element Plus 的 Form 上进行了一层封装，支持了一些预设，并且封装了一些行为。这里只列出与 Element Plus Form 不同和部分原始的 API。
@@ -475,12 +720,13 @@ ElFormPro 在 Element Plus 的 Form 上进行了一层封装，支持了一些�
 
 | 属性 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| labelPosition | 标签位置；支持字符串或响应式对象，对象配置见下方 | <ApiType type="string" signature="'left' &#124; 'right' &#124; 'top'" /> / <ApiType type="object" signature="FormProLabelPositionConfig" /> | `{ base: 'top', md: 'right' }` |
+| labelPosition | 标签位置；支持字符串或响应式对象，对象配置见下方 | <ApiType type="string" signature="'left' &#124; 'right' &#124; 'top'" /> \| <ApiType type="object" signature="FormProLabelPositionConfig" /> | `{ base: 'top', md: 'right' }` |
+| labelWidth | 标签宽度，支持数字或 CSS 宽度值 | `string` \| `number` | - |
 | buttonAlign | 底部按钮区域水平对齐方式 | <ApiType type="string" signature="'start' &#124; 'center' &#124; 'right'" /> | `'right'` |
 | buttons | 提交、重置、取消按钮配置 | `FormProButtons` | - |
-| row | 分栏间隔 | `object` | `{ gutter: 18 }` |
-| col | 栅格列配置 | `number` / `FormProColProps` | `24` |
-| actionCol | 操作按钮栅格列配置 | `number` / `FormProColProps` | - |
+| row | 分栏间隔 | `Record<string, any>` | `{ gutter: 18 }` |
+| col | 栅格列配置 | `number` \| `FormProColProps` | `24` |
+| actionCol | 操作按钮栅格列配置 | `number` \| `FormProColProps` | - |
 
 #### labelPosition 对象配置
 
@@ -502,19 +748,31 @@ ElFormPro 在 Element Plus 的 Form 上进行了一层封装，支持了一些�
 | 属性 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | key | 字段名，唯一性；组合字段容器可省略 | `string` | - |
-| label | 标签文本 | `string` / `Function` | - |
-| type | 字段组件类型；`tree` 需 Element Plus 2.1.8+，`mention` 需 Element Plus 2.8.0+，`inputTag` 需 Element Plus 2.9.0+ | <ApiType type="enum" signature="'input' &#124; 'password' &#124; 'number' &#124; 'select' &#124; 'selectV2' &#124; 'radio' &#124; 'checkbox' &#124; 'date' &#124; 'time' &#124; 'timeSelect' &#124; 'autocomplete' &#124; 'cascader' &#124; 'inputTag' &#124; 'rate' &#124; 'slider' &#124; 'switch' &#124; 'tree' &#124; 'transfer' &#124; 'upload' &#124; 'mention'" /> / `Component` | input |
-| formItemProps | 透传给 ElFormItem 的属性 | `object` | - |
-| fieldProps | 透传给 type 组件的属性 | `object` | - |
-| defaultValue | 字段初始值 | `any` | - |
-| col | 栅格列配置 | `number` / `FormProColProps` | `24` |
+| label | 标签文本 | `string` \| `(() => VNodeChild)` | - |
+| type | 字段组件类型；`tree` 需 Element Plus 2.1.8+，`mention` 需 Element Plus 2.8.0+，`inputTag` 需 Element Plus 2.9.0+ | <ApiType type="enum" signature="'input' &#124; 'password' &#124; 'number' &#124; 'select' &#124; 'selectV2' &#124; 'radio' &#124; 'checkbox' &#124; 'date' &#124; 'time' &#124; 'timeSelect' &#124; 'autocomplete' &#124; 'cascader' &#124; 'inputTag' &#124; 'rate' &#124; 'slider' &#124; 'switch' &#124; 'tree' &#124; 'transfer' &#124; 'upload' &#124; 'mention' &#124; 'captcha'" /> \| `Component` | input |
+| formItemProps | 透传给 ElFormItem 的属性 | `Record<string, any>` | - |
+| fieldProps | 透传给 type 组件的属性；`captcha` 使用 `FormProCaptchaProps` | `Record<string, any>` | - |
+| defaultValue | 字段初始值；不使用 `v-model` 时，FormPro 会使用它初始化内部表单值 | `any` | - |
+| col | 栅格列配置 | `number` \| `FormProColProps` | `24` |
+| labelWidth | 单个字段的标签宽度，覆盖全局配置 | `string` \| `number` | - |
 | rules | 校验规则 | `FormItemRule[]` | - |
-| hidden | 是否隐藏 | `boolean` | false |
+| hidden | 是否隐藏 | `boolean` | `false` |
 | slot | 自定义插槽 | `string` | - |
 | children | 子字段配置，用于组合字段 | `FormProSchemaItem[]` | - |
-| separator | 子字段之间显示的分隔符 | `string` | '' |
+| separator | 组合字段之间的分隔符 | `string` | `''` |
 
 更多属性请参考 [**Element Plus FormItem API**](https://element-plus.org/zh-CN/component/form.html#formitem-attributes)
+
+### FormProCaptchaProps
+
+| 属性 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| phoneName | 手机号字段的 key；配置后获取验证码前会先校验该字段 | `string` | - |
+| countDown | 倒计时秒数 | `number` | `60` |
+| onGetCaptcha | 获取验证码；参数为 `phoneName` 对应字段的值 | `(phone: string) => Promise<void>` | - |
+| onTiming | 倒计时变化回调 | `(seconds: number) => void` | - |
+| captchaTextRender | 自定义获取验证码按钮文案 | `(timing: boolean, seconds: number) => string` | - |
+| captchaProps | 获取验证码按钮属性 | `ButtonProps` | - |
 
 ## 布局配置
 
@@ -557,7 +815,7 @@ const schema = [
 
 ## 按钮配置
 
-buttons 用来配置表单底部的提交、重置和取消按钮。默认显示“提交”和“重置”
+buttons 用来配置表单底部的提交、重置和取消按钮，实际使用 `ElButtonPro` 渲染，支持其全部 props。默认显示“提交”和“重置”
 
 ```ts
 const formConfig: FormProConfig = {
@@ -565,6 +823,20 @@ const formConfig: FormProConfig = {
     submit: { text: '搜索', type: 'primary' },
     reset: { text: '清空' },
     cancel: { text: '返回' },
+  },
+}
+```
+
+按钮配置也会透传给 `ElButtonPro`，例如使用 `block` 独占一行：
+
+```ts
+const formConfig: FormProConfig = {
+  buttons: {
+    submit: {
+      text: '提交',
+      type: 'primary',
+      block: true,
+    },
   },
 }
 ```
@@ -593,7 +865,7 @@ const formConfig: FormProConfig = {
 </template>
 ```
 
-更多按钮 API 配置请参考 [**Element Plus Button**](https://element-plus.org/zh-CN/component/button.html#button-attributes)
+更多按钮 API 配置请参考 [**Element Plus Button**](https://element-plus.org/zh-CN/component/button.html#button-attributes)；`block`、`iconPlacement`、`gradient`、`hoverGradient` 使用 ButtonPro 扩展 props。
 
 ## Form Exposes
 

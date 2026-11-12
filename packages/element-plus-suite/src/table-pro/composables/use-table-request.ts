@@ -46,24 +46,16 @@ export function useTableRequest<Row>(
         signal: currentController.signal,
       })
 
+      const isStale = currentController.signal.aborted || currentId !== requestId
+
       // 已取消或已有更新请求时丢弃本次结果。
-      if (
-        currentController.signal.aborted ||
-        currentId !== requestId
-      ) {
-        return
-      }
+      if (isStale) return
 
       options.onData?.(result)
       options.onLoaded?.(result)
     } catch (error) {
       // 取消请求不视为业务错误。
-      if (
-        currentController.signal.aborted ||
-        currentId !== requestId
-      ) {
-        return
-      }
+      if (currentController.signal.aborted || currentId !== requestId) return
 
       options.onError?.(error)
     } finally {

@@ -1,15 +1,90 @@
 /*
  * TablePro 只负责内容间距，不改变根节点的文档流布局。
  */
-.el-table-pro {
+.eps-table-pro {
   min-width: 0;
 }
 
-.el-table-pro .el-pagination {
+.eps-table-pro__pagination {
   margin-top: 16px;
 }
 
 /* 左侧留出可用空间，让分页信息与页码操作分列。 */
-.el-table-pro .el-pagination .btn-prev {
+.eps-table-pro__pagination .btn-prev {
   margin-left: auto;
+}
+
+/* Title bar */
+.eps-table-pro__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 32px;
+  margin-bottom: 12px;
+}
+
+.eps-table-pro__header-title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+.eps-table-pro__header-title-text {
+  overflow: hidden;
+  color: var(--el-text-color-primary);
+  font-size: 16px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eps-table-pro__toolbar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.eps-table-pro__toolbar-actions,
+.eps-table-pro__toolbar-options {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.eps-table-pro__toolbar-button {
+  color: var(--el-text-color-regular);
+}
+
+.eps-table-pro__toolbar-button:hover {
+  color: var(--el-color-primary);
+}
+
+.eps-table-pro__density-item.is-active {
+  color: var(--el-color-primary);
+}
+
+/* Fullscreen */
+.eps-table-pro.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow: hidden;
+  background: var(--el-bg-color);
+}
+
+.eps-table-pro.is-fullscreen > .eps-table-pro__table {
+  flex: 1;
+  min-height: 0;
+}
+
+.eps-table-pro.is-fullscreen .eps-table-pro__pagination {
+  flex: none;
+  margin-top: 12px;
 }
